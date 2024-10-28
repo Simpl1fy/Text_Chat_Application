@@ -7,6 +7,11 @@ const router = express.Router();
 router.post('/signup', async(req, res) => {
     try {
         const data = req.body;
+        console.log(data);
+        const user = await User.findOne({email: data.email});
+        if(user) {
+            return res.status(401).json({message: "Email already exits"})
+        }
         const newUser = new User(data);
         const response = await newUser.save();
         console.log(response);
@@ -16,7 +21,7 @@ router.post('/signup', async(req, res) => {
         }
         const token = generateToken(payload);
         console.log("Token has been generated = ", token);  
-        res.status(200).json({"response": response, "token": token});
+        res.status(200).json([response, token]);
     } catch(err) {
         console.log("An error occured = ", err);
         res.status(500).json({"Error": "Internal Server Error"});
