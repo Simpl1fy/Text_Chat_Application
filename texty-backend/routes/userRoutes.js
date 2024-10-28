@@ -83,4 +83,23 @@ router.post('/add_contact', jwtAuthMiddleware, async(req, res) => {
     } 
 });
 
+router.get('/contacts', jwtAuthMiddleware, async (req, res) => {
+    try {
+        const userData = req.jwtPayload; // Assuming jwtAuthMiddleware attaches userId to req
+
+        // Find user and populate contacts
+        const user = await User.findById(userData.id).populate('contacts', 'name email');
+        
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Return populated contacts
+        res.status(200).json(user.contacts);
+    } catch (err) {
+        console.error('An error occurred:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+})
+
 module.exports = router;
