@@ -16,4 +16,22 @@ router.post('/signup', async(req, res) => {
     }
 })
 
+router.post('/login', async(req, res) => {
+    try {
+        const {email, password} = req.body;
+        const user = await User.findOne({email: email});
+
+        if(!user) {
+            return res.status(401).json({"error": "invalid email"});
+        }
+        if(!(await user.comparePassword(password))) {
+            return res.status(401).json({"error": "wrong password"});
+        }
+        res.status(200).json({"user": user});
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({"error": "Internal server error"});
+    }
+})
+
 module.exports = router;
