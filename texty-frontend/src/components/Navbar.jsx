@@ -1,5 +1,13 @@
 import { Outlet, Link } from "react-router-dom";
-import { Button } from "@material-tailwind/react";
+import { 
+  Button,
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+ } from "@material-tailwind/react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleUser } from '@fortawesome/free-solid-svg-icons';
 
 export default function Navbar() {
   return (
@@ -13,7 +21,18 @@ export default function Navbar() {
           </div>
         </div>
         <div className="me-5">
-          <Button>Signup</Button>
+          <Button className="me-2">Signup</Button>
+          <Menu>
+          <MenuHandler>
+            <Button>
+              <FontAwesomeIcon icon={faCircleUser} className="fa-xl" />
+            </Button>
+          </MenuHandler>
+          <MenuList>
+            <MenuItem>Profile</MenuItem>
+            <MenuItem>Logout</MenuItem>
+          </MenuList>
+        </Menu>
         </div>
       </div>
       <Outlet />
