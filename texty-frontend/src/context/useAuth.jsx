@@ -44,7 +44,7 @@ export function AuthProvider({ children }) {
 
 // Assigning prop types
 AuthProvider.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.any,
 }
 
 

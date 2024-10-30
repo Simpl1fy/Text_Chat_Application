@@ -4,7 +4,10 @@ import {
     Button,
     Typography,
 } from "@material-tailwind/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from 'axios';
+import { useAuth } from "../context/useAuth";
+
 
 const isValidEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -17,7 +20,14 @@ export default function SimpleRegistrationForm() {
   const [password, setPassword] = useState('');
   const [emailValid, setEmailValid] = useState(true);
 
-  const handleSubmit = (e) => {
+  const { signup } = useAuth();
+
+  // useEffect(() => {
+  //   console.log("isLoggedIn =", isLoggedIn);
+  //   console.log("localToken =", localToken);
+  // }, [isLoggedIn, localToken]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if(!emailValid) {
       console.log("Email is not valid");
@@ -26,6 +36,17 @@ export default function SimpleRegistrationForm() {
     console.log("name is = ", name);
     console.log("Email is = ", email);
     console.log("password is = ", password);
+    try {
+      const res = await axios.post("http://localhost:5000/user/signup", {
+        name: name,
+        email: email,
+        password: password
+      });
+      console.log(res.data.token);
+      signup(res.data.token);
+    } catch(err) {
+      console.log("An error occured = ", err);
+    }
   }
 
   const handleEmailChange = (e) => {
