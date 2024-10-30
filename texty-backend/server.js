@@ -2,9 +2,21 @@ const express = require('express');
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const db = require('./database/db');
+const cors = require('cors');
 
 const app = express();
 
+const corsOptions = {
+    "origin": "http://localhost:3000",
+    "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+    "preflightContinue": false,
+    "optionsSuccessStatus": 204
+}
+
+// cors middleware
+app.use(cors(corsOptions));
+
+// body parser
 app.use(bodyParser.json());
 
 
