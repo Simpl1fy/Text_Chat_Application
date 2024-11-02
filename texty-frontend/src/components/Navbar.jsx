@@ -10,43 +10,33 @@ import {
 } from "@material-tailwind/react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleUser, faBars } from '@fortawesome/free-solid-svg-icons';
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "../context/useAuth";
+import { useIsMobile } from "../context/useIsMobile";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  // const [isMobile, setIsMobile] = useState(false);
 
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, signout } = useAuth();
+  const { isMobile } = useIsMobile();
 
   const toggleDrawer = () => setDrawerOpen(!drawerOpen);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth <= 768) { // Example breakpoint for mobile
-        setIsMobile(true);
-      } else {
-        setIsMobile(false);
-      }
-    };
-
-    // Add event listener
-    window.addEventListener('resize', handleResize);
-    
-    // Call handler initially to set the state based on current width
-    handleResize();
-
-    // Cleanup function to remove event listener
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [])
 
   const handleSignupClick = () => {
     navigate("/signup");
     if(isMobile) {
       toggleDrawer();
+    }
+  }
+
+  const handleLogoutClick = () => {
+    if(isMobile) {
+      signout();
+      toggleDrawer();
+    } else {
+      signout();
     }
   }
 
@@ -80,7 +70,7 @@ export default function Navbar() {
               </MenuHandler>
               <MenuList>
                 <MenuItem>Profile</MenuItem>
-                <MenuItem>Logout</MenuItem>
+                <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
               </MenuList>
             </Menu>
           )}
@@ -103,7 +93,7 @@ export default function Navbar() {
             {isLoggedIn ? (
               <>
                 <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>Profile</Button>
-                <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>Logout</Button>
+                <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleLogoutClick}>Logout</Button>
               </>
               ) : (
               <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleSignupClick}>Signup</Button>

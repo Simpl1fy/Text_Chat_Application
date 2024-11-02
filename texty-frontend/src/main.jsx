@@ -11,6 +11,7 @@ import Navbar from './components/Navbar'
 import Home from './components/Home'
 import Signup from './components/Signup'
 import { AuthProvider } from './context/useAuth';
+import { MobileProvider } from './context/useIsMobile';
 
 const router = createBrowserRouter([
   {
@@ -37,7 +38,9 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ThemeProvider>
       <AuthProvider>
-        <RouterProvider router={router} />
+        <MobileProvider>
+          <RouterProvider router={router} />
+        </MobileProvider>
       </AuthProvider>
     </ThemeProvider>
   </StrictMode>,
