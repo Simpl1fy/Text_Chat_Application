@@ -10,7 +10,7 @@ router.post('/signup', async(req, res) => {
         console.log(data);
         const user = await User.findOne({email: data.email});
         if(user) {
-            return res.status(401).json({message: "Email already exits"})
+            return res.status(400).json({message: "Email already exists"})
         }
         const newUser = new User(data);
         const response = await newUser.save();

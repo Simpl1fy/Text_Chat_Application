@@ -3,8 +3,9 @@ import {
     Input,
     Button,
     Typography,
+    Alert
 } from "@material-tailwind/react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from 'axios';
 import { useAuth } from "../context/useAuth";
 
@@ -14,23 +15,47 @@ const isValidEmail = (email) => {
   return emailRegex.test(email);
 }
 
+function Icon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={2}
+      stroke="currentColor"
+      className="h-6 w-6"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+      />
+    </svg>
+  )
+}
+
 export default function SimpleRegistrationForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailValid, setEmailValid] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [error, setError] = useState(false);
 
   const { signup } = useAuth();
 
-  // useEffect(() => {
-  //   console.log("isLoggedIn =", isLoggedIn);
-  //   console.log("localToken =", localToken);
-  // }, [isLoggedIn, localToken]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if(!name || !email || !password) {
+      setError(true);
+      setErrorMessage("All information must be filled");
+      return;
+    }
+
     if(!emailValid) {
-      console.log("Email is not valid");
+      setError(true);
+      setErrorMessage("The given email is not valid");
       return;
     }
     console.log("name is = ", name);
@@ -45,7 +70,23 @@ export default function SimpleRegistrationForm() {
       console.log(res.data.token);
       signup(res.data.token);
     } catch(err) {
-      console.log("An error occured = ", err);
+      if (err.response) {
+        console.log("Server responded with an error:", err.response.status);
+        
+        // Handle 400 status specifically for "Email already exists"
+        if (err.response.status === 400) {
+          setError(true);
+          setErrorMessage(err.response.data.message);
+        } else {
+          setError(true);
+          setErrorMessage("An error occurred. Please try again later.");
+        }
+      } else {
+        // Handle network errors or other unexpected errors
+        console.log("An error occurred:", err);
+        setError(true);
+        setErrorMessage("Network error - Unable to reach the server.");
+      }
     }
   }
 
@@ -60,9 +101,14 @@ export default function SimpleRegistrationForm() {
         <Typography variant="h4" color="blue-gray">
             Sign Up
         </Typography>
-        <Typography color="gray" className="mt-1 font-normal">
+        <Typography color="gray" className="my-1 font-normal">
             Nice to meet you! Enter your details to register.
         </Typography>
+        {error && 
+          <Alert variant="gradient" color="red" icon={<Icon/>}>
+            {errorMessage}
+          </Alert>
+        }
           <form className="mt-8 mb-2 w-80 max-w-screen-lg sm:w-96" onSubmit={handleSubmit}>
             <div className="mb-1 flex flex-col gap-6">
             <Typography variant="h6" color="blue-gray" className="-mb-3">
@@ -76,7 +122,6 @@ export default function SimpleRegistrationForm() {
                 className: "before:content-none after:content-none",
                 }}
                 onChange={(e) => setName(e.target.value)}
-                required
             />
             <Typography variant="h6" color="blue-gray" className="-mb-3">
                 Your Email
@@ -91,7 +136,6 @@ export default function SimpleRegistrationForm() {
                 labelProps={{
                 className: "before:content-none after:content-none",
                 }}
-                required
                 onChange={handleEmailChange}
             />
             {!emailValid && <Typography
@@ -123,7 +167,6 @@ export default function SimpleRegistrationForm() {
                 labelProps={{
                 className: "before:content-none after:content-none",
                 }}
-                required={true}
                 onChange={(e) => {setPassword(e.target.value)}}
             />
             </div>
