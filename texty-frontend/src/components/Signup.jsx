@@ -8,7 +8,7 @@ import {
 import { useState } from "react";
 import axios from 'axios';
 import { useAuth } from "../context/useAuth";
-import { ExcalamtionIcon } from '../icons/ExclamationIcon';
+import ExclamationIcon from "../icons/ExclamationIcon";
 
 
 const isValidEmail = (email) => {
@@ -87,7 +87,7 @@ export default function SimpleRegistrationForm() {
             Nice to meet you! Enter your details to register.
         </Typography>
         {error && 
-          <Alert variant="gradient" color="red" icon={<ExcalamtionIcon />}>
+          <Alert variant="gradient" color="red" icon={<ExclamationIcon />}>
             {errorMessage}
           </Alert>
         }
