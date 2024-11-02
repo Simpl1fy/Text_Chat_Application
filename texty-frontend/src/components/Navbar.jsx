@@ -11,11 +11,14 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleUser, faBars } from '@fortawesome/free-solid-svg-icons';
 import { useState, useEffect } from "react";
+import { useAuth } from "../context/useAuth";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  const { isLoggedIn } = useAuth();
 
   const toggleDrawer = () => setDrawerOpen(!drawerOpen);
 
@@ -63,19 +66,24 @@ export default function Navbar() {
         </div>
 
         {/* User Menu & Signup Button */}
-        <div className="hidden md:flex items-center space-x-3 mr-5">
-          <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleSignupClick}>Signup</Button>
-          <Menu>
-            <MenuHandler>
-              <IconButton className="bg-inherit hover:bg-white/10">
-                <FontAwesomeIcon icon={faCircleUser} className="fa-xl text-white" />
-              </IconButton>
-            </MenuHandler>
-            <MenuList>
-              <MenuItem>Profile</MenuItem>
-              <MenuItem>Logout</MenuItem>
-            </MenuList>
-          </Menu>
+        <div className="hidden md:flex items-center space-x-3 mr-5"> 
+          {!isLoggedIn ? (
+            <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleSignupClick}>
+            Signup
+            </Button>
+          ) : (
+            <Menu>
+              <MenuHandler>
+                <IconButton className="bg-inherit hover:bg-white/10">
+                  <FontAwesomeIcon icon={faCircleUser} className="fa-xl text-white" />
+                </IconButton>
+              </MenuHandler>
+              <MenuList>
+                <MenuItem>Profile</MenuItem>
+                <MenuItem>Logout</MenuItem>
+              </MenuList>
+            </Menu>
+          )}
         </div>
 
         {/* Hamburger Menu for Mobile */}
@@ -92,9 +100,14 @@ export default function Navbar() {
             <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>
               <Link to="https://github.com/Simpl1fy">About Developer</Link>
             </Button>
-            <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>Profile</Button>
-            <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleSignupClick}>Signup</Button>
-            <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>Logout</Button>
+            {isLoggedIn ? (
+              <>
+                <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>Profile</Button>
+                <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>Logout</Button>
+              </>
+              ) : (
+              <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleSignupClick}>Signup</Button>
+            )}
           </div>
         </Drawer>
       </div>
