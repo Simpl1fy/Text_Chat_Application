@@ -10,6 +10,7 @@ import { ThemeProvider } from '@material-tailwind/react';
 import Navbar from './components/Navbar'
 import Home from './components/Home'
 import Signup from './components/Signup'
+import Signin from './components/Signin';
 import { AuthProvider } from './context/useAuth';
 import { MobileProvider } from './context/useIsMobile';
 
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
       {
         path: '/signup',
         element: <Signup />
+      },
+      {
+        path: '/signin',
+        element: <Signin />
       },
       {
         index: true,
