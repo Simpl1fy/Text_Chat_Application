@@ -7,6 +7,9 @@ import {
 } from "@material-tailwind/react";
 import { useState } from "react";
 import ExclamationIcon from "../icons/ExclamationIcon";
+import { useAuth } from "../context/useAuth";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
 
 
 const isValidEmail = (email) => {
@@ -16,25 +19,64 @@ const isValidEmail = (email) => {
 
 export default function Signin() {
 
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailValid, setEmailValid] = useState(true);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const { login } = useAuth();
 
   const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-    setEmailValid(isValidEmail(email));
+    const value = e.target.value;
+    setEmail(value);
+    setEmailValid(isValidEmail(value));
+    setError(false);
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if(!email || !password) {
+      setError(true);
+      setErrorMessage("All information must be filled");
+      return;
+    }
+
+    if(!emailValid) {
+      setError(true);
+      setErrorMessage("The given email is not valid");
+      return;
+    }
+
     try {
-      console.log(password);
-      console.log(email);
-      setError("");
-      setErrorMessage("");
+      const res = await axios.post('http://localhost:5000/user/login', {
+        email: email,
+        password: password
+      });
+      login(res.data.token);
+      setError(false);
+      setErrorMessage('');
+      navigate('/home');
     } catch(err) {
-      console.log(err);
+      if(err.response) {
+        console.log("Server responded with error = ", err.response.status);
+
+        if(err.response.status === 404) {
+          setError(true);
+          setErrorMessage(err.response.data.message);
+        } else if (err.response.status === 401) {
+          setError(true);
+          setErrorMessage(err.response.data.message);
+        } else {
+          setError(true);
+          setErrorMessage("Network error - Unable to reach the server.");
+        }
+      } else {
+        setError(true);
+        setErrorMessage("Network error - Unable to reach the server.");
+      }
     }
   }
 
@@ -95,9 +137,7 @@ export default function Signin() {
             </Button>
             <Typography color="gray" className="mt-4 text-center font-normal">
             Don&apos;t have an account?{" "}
-            <a href="#" className="font-medium text-gray-900">
-                Sign Up
-            </a>
+            <Link to="/signup" className="font-medium text-gray-900">Sign Up</Link>
             </Typography>
           </form>
         </Card>

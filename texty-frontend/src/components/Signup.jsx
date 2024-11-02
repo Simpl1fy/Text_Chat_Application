@@ -9,7 +9,7 @@ import { useState } from "react";
 import axios from 'axios';
 import { useAuth } from "../context/useAuth";
 import ExclamationIcon from "../icons/ExclamationIcon";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 const isValidEmail = (email) => {
@@ -25,6 +25,7 @@ export default function SimpleRegistrationForm() {
   const [errorMessage, setErrorMessage] = useState('');
   const [error, setError] = useState(false);
 
+  const navigate = useNavigate();
   const { signup } = useAuth();
 
   const handleSubmit = async (e) => {
@@ -50,8 +51,8 @@ export default function SimpleRegistrationForm() {
         email: email,
         password: password
       });
-      console.log(res.data.token);
       signup(res.data.token);
+      navigate('/signin');
     } catch(err) {
       if (err.response) {
         console.log("Server responded with an error:", err.response.status);
