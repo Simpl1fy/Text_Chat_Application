@@ -13,6 +13,7 @@ import Signup from './components/Signup'
 import Signin from './components/Signin';
 import { AuthProvider } from './context/useAuth';
 import { MobileProvider } from './context/useIsMobile';
+import { ModalProvider } from './context/MondalContext';
 
 const router = createBrowserRouter([
   {
@@ -43,9 +44,11 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ThemeProvider>
       <AuthProvider>
-        <MobileProvider>
-          <RouterProvider router={router} />
-        </MobileProvider>
+        <ModalProvider>
+          <MobileProvider>
+            <RouterProvider router={router} />
+          </MobileProvider>
+        </ModalProvider>
       </AuthProvider>
     </ThemeProvider>
   </StrictMode>,

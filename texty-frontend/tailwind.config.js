@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
 import withMT from '@material-tailwind/react/utils/withMT';
-import { slate, stone } from 'tailwindcss/colors'
+import { sky, slate, stone, zinc } from 'tailwindcss/colors'
 
 export default withMT({
   content: [
@@ -14,6 +14,8 @@ export default withMT({
       colors: {
         slate: slate,
         stone: stone,
+        zinc: zinc,
+        sky: sky,
       }
     },
   },

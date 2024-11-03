@@ -1,11 +1,14 @@
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import SearchIcon from '@mui/icons-material/Search';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/useAuth';
+import { useModal } from '../context/MondalContext';
 
 export default function Contact() {
 
   const { localToken } = useAuth();
+  const { isModalOpen, toggleModal } = useModal();
 
   const [contacts, setContacts] = useState([])
 
@@ -27,7 +30,7 @@ export default function Contact() {
   }, [localToken]);
 
   return (
-    <div>
+    <div className='h-dvh relative'>
       <nav className="py-3.5 px-4 bg-white shadow-md mb-2">
           <div className="flex  items-center rounded-lg border-2 border-zinc-600 bg-sky-50">
             <div className='px-2'><SearchIcon/></div>
@@ -44,6 +47,9 @@ export default function Contact() {
             ))
           }
         </ul>
+        <div className='absolute bottom-4 right-2 hover:cursor-pointer'>
+          <AddCircleIcon fontSize='large' />
+        </div>
     </div>
   )
 }
