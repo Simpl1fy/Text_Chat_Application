@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/useAuth';
 import { useModal } from '../context/MondalContext';
+import AddContactModal from './AddContactModal';
 
 export default function Contact() {
 
@@ -47,9 +48,10 @@ export default function Contact() {
             ))
           }
         </ul>
-        <div className='absolute bottom-4 right-2 hover:cursor-pointer'>
+        <div className='absolute bottom-4 right-2 hover:cursor-pointer' onClick={toggleModal}>
           <AddCircleIcon fontSize='large' />
         </div>
+        <AddContactModal isModalOpen={isModalOpen} toggleModal={toggleModal} />
     </div>
   )
 }

@@ -13,6 +13,8 @@ import { faCircleUser, faBars } from '@fortawesome/free-solid-svg-icons';
 import { useState } from "react";
 import { useAuth } from "../context/useAuth";
 import { useIsMobile } from "../context/useIsMobile";
+import { useModal } from "../context/MondalContext";
+import AddContactModal from "./AddContactModal";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -21,6 +23,7 @@ export default function Navbar() {
 
   const { isLoggedIn, signout } = useAuth();
   const { isMobile } = useIsMobile();
+  const { isModalOpen, toggleModal } = useModal();
 
   const toggleDrawer = () => setDrawerOpen(!drawerOpen);
 
@@ -40,6 +43,13 @@ export default function Navbar() {
     }
   }
 
+  const handleAddContactButton = () => {
+    toggleDrawer();
+    setTimeout(() => {
+      toggleModal();
+    }, [1000]);
+  };
+
   return (
     <>
       <div className="w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex justify-between items-center p-4">
@@ -48,7 +58,7 @@ export default function Navbar() {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex border border-white rounded-lg p-2 space-x-4">
-            <Button className="bg-inherit text-white hover:bg-white/10">Add a Contact</Button>
+            <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleModal}>Add a Contact</Button>
             <Button className="bg-inherit text-white hover:bg-white/10">
               <Link to="https://github.com/Simpl1fy">About Developer</Link>
             </Button>
@@ -86,7 +96,7 @@ export default function Navbar() {
         {/* Drawer Menu */}
         <Drawer open={drawerOpen} onClose={toggleDrawer} className="p-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
           <div className="flex flex-col space-y-4">
-            <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>Add a Contact</Button>
+            <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleAddContactButton}>Add a Contact</Button>
             <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>
               <Link to="https://github.com/Simpl1fy">About Developer</Link>
             </Button>
@@ -100,6 +110,7 @@ export default function Navbar() {
             )}
           </div>
         </Drawer>
+        <AddContactModal isModalOpen={isModalOpen} toggleModal={toggleModal} />
       </div>
       <Outlet />
     </>
