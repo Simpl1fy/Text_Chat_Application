@@ -107,4 +107,19 @@ router.get('/contacts', jwtAuthMiddleware, async (req, res) => {
     }
 })
 
+router.get('/search_email', async(req, res) => {
+    try {
+        const { searchTerm } = req.body;
+        
+        const regex = new RegExp(searchTerm, 'i');
+
+        const users = await User.find({email: regex}, 'name email');
+
+        res.status(200).json(users);
+    } catch(err) {
+        console.log(err);
+        return res.status(500).json({"error": "Internal Server Error"});
+    }
+});
+
 module.exports = router;
