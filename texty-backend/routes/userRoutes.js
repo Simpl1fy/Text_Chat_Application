@@ -108,14 +108,24 @@ router.get('/contacts', jwtAuthMiddleware, async (req, res) => {
 })
 
 router.post('/search_email', async(req, res) => {
+    const { searchTerm } = req.body;
+
+    const regex = new RegExp(`^${searchTerm}`, 'i');
     try {
-        const { searchTerm } = req.body;
-        console.log(searchTerm);
-        
-        const regex = new RegExp(searchTerm, 'i');
-
-        const users = await User.find({email: regex}, 'name email');
-
+        const users = await User.aggregate([
+            {
+              $project: {
+                name: 1,
+                email: 1,
+                username: { $arrayElemAt: [{ $split: ['$email', '@'] }, 0] }
+              }
+            },
+            {
+              $match: {
+                username: regex
+              }
+            }
+          ]);
         res.status(200).json(users);
     } catch(err) {
         console.log(err);

@@ -17,6 +17,11 @@ export default function AddContactModal({ isModalOpen, toggleModal }) {
   const [searchEmail, setSearchEmail] = useState('');
   const [result, setResult] = useState([]);
 
+  const handleModalClose = () => {
+    setResult([]);
+    toggleModal();
+  }
+
   const handleEmailChange = (e) => {
     let text = e.target.value;
     setSearchEmail(text);
@@ -30,7 +35,6 @@ export default function AddContactModal({ isModalOpen, toggleModal }) {
           const res = await axios.post('http://localhost:5000/user/search_email', {
             searchTerm: searchEmail
           })
-          console.log(res.data);
           setResult(res.data);
         } catch(err) {
           console.error("An error occured while fetching search results:", err);
@@ -46,7 +50,7 @@ export default function AddContactModal({ isModalOpen, toggleModal }) {
     <>
       <Dialog open={isModalOpen}>
         <DialogHeader>Add a Contact</DialogHeader>
-        <DialogBody className="overflow-y-scroll">
+        <DialogBody>
           <Typography
             variant='small'
             color='blue-gray'
@@ -72,7 +76,7 @@ export default function AddContactModal({ isModalOpen, toggleModal }) {
           <Button
             variant='text'
             color='red'
-            onClick={toggleModal}
+            onClick={handleModalClose}
           >
             Cancel
           </Button>
