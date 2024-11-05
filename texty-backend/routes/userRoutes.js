@@ -107,9 +107,10 @@ router.get('/contacts', jwtAuthMiddleware, async (req, res) => {
     }
 })
 
-router.get('/search_email', async(req, res) => {
+router.post('/search_email', async(req, res) => {
     try {
         const { searchTerm } = req.body;
+        console.log(searchTerm);
         
         const regex = new RegExp(searchTerm, 'i');
 

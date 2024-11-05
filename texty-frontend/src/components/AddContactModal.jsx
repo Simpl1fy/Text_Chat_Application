@@ -7,19 +7,38 @@ import {
   Input,
   Button,
 } from '@material-tailwind/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
   
 export default function AddContactModal({ isModalOpen, toggleModal }) {
 
   const [searchEmail, setSearchEmail] = useState('');
+  const [result, setResult] = useState([]);
 
   const handleEmailChange = (e) => {
     let text = e.target.value;
     setSearchEmail(text);
     console.log(searchEmail);
   }
+
+  useEffect(() => {
+    if (searchEmail) {
+      const searchFunction = async() => {
+        try {
+          const res = await axios.post('http://localhost:5000/user/search_email', {
+            searchTerm: searchEmail
+          })
+          console.log(res.data);
+          setResult(res.data);
+        } catch(err) {
+          console.error("An error occured while fetching search results:", err);
+        }
+      }
+      searchFunction();
+    }
+  }, [searchEmail]);
 
   return (
     <>
@@ -41,6 +60,11 @@ export default function AddContactModal({ isModalOpen, toggleModal }) {
             }}
             onChange={handleEmailChange}
           />
+          <ul>
+            {result.map((user) => (
+              <li key={user.id}>{user.name} - {user.email}</li>
+            ))}
+          </ul>
         </DialogBody>
         <DialogFooter>
           <Button
