@@ -37,6 +37,8 @@ export default function AddContactModal({ isModalOpen, toggleModal }) {
         }
       }
       searchFunction();
+    } else {
+      setResult([]);
     }
   }, [searchEmail]);
 
@@ -44,7 +46,7 @@ export default function AddContactModal({ isModalOpen, toggleModal }) {
     <>
       <Dialog open={isModalOpen}>
         <DialogHeader>Add a Contact</DialogHeader>
-        <DialogBody>
+        <DialogBody className="overflow-y-scroll">
           <Typography
             variant='small'
             color='blue-gray'
@@ -62,7 +64,7 @@ export default function AddContactModal({ isModalOpen, toggleModal }) {
           />
           <ul>
             {result.map((user) => (
-              <li key={user.id}>{user.name} - {user.email}</li>
+              <li key={user.id} className='w-100 m-1 p-2 bg-gray-100 border-2 rounded-lg hover:cursor-pointer'>{user.name} - {user.email}</li>
             ))}
           </ul>
         </DialogBody>
