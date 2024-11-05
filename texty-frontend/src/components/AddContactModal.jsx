@@ -63,6 +63,7 @@ export default function AddContactModal({ isModalOpen, toggleModal, setIsUpdated
       console.log(res.data);
       setIsUpdated(prev => !prev);
       toggleModal();
+      setResult([]);
     } catch(err) {
       console.error("An error occured while adding contact =", err);
     }

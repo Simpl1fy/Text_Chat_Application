@@ -42,7 +42,7 @@ export default function Contact() {
         <ul>
           {
             contacts.map((contact) => (
-              <li key={contact._id} className="p-3 mb-2 bg-slate-300 mx-4 rounded-lg">
+              <li key={contact._id} className="p-3 mb-2 bg-slate-300 mx-4 rounded-lg hover:cursor-pointer">
                 <p className='font-bold text-xl'>{contact.name}</p>
                 <p>{contact.email}</p>
               </li>
