@@ -8,7 +8,7 @@ import AddContactModal from './AddContactModal';
 
 export default function Contact() {
 
-  const { localToken } = useAuth();
+  const { localToken, isLoggedIn } = useAuth();
   const { isModalOpen, toggleModal } = useModal();
 
   const [contacts, setContacts] = useState([]);
@@ -29,7 +29,7 @@ export default function Contact() {
     };
 
     fetchContacts();
-  }, [isUpdated]);
+  }, [isUpdated, localToken, isLoggedIn]);
 
   return (
     <div className='h-dvh relative'>
