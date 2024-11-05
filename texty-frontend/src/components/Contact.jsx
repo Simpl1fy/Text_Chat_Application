@@ -11,7 +11,8 @@ export default function Contact() {
   const { localToken } = useAuth();
   const { isModalOpen, toggleModal } = useModal();
 
-  const [contacts, setContacts] = useState([])
+  const [contacts, setContacts] = useState([]);
+  const [isUpdated, setIsUpdated] = useState(false);
 
   useEffect(() => {
     const fetchContacts = async() => {
@@ -28,7 +29,7 @@ export default function Contact() {
     };
 
     fetchContacts();
-  }, [localToken]);
+  }, [isUpdated]);
 
   return (
     <div className='h-dvh relative'>
@@ -51,7 +52,7 @@ export default function Contact() {
         <div className='absolute bottom-4 right-2 hover:cursor-pointer' onClick={toggleModal}>
           <AddCircleIcon fontSize='large' />
         </div>
-        <AddContactModal isModalOpen={isModalOpen} toggleModal={toggleModal} />
+        <AddContactModal isModalOpen={isModalOpen} toggleModal={toggleModal} setIsUpdated={setIsUpdated} />
     </div>
   )
 }

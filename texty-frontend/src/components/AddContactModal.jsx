@@ -10,9 +10,12 @@ import {
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import { useAuth } from '../context/useAuth';
 
   
-export default function AddContactModal({ isModalOpen, toggleModal }) {
+export default function AddContactModal({ isModalOpen, toggleModal, setIsUpdated }) {
+
+  const { localToken } = useAuth();
 
   const [searchEmail, setSearchEmail] = useState('');
   const [result, setResult] = useState([]);
@@ -46,6 +49,25 @@ export default function AddContactModal({ isModalOpen, toggleModal }) {
     }
   }, [searchEmail]);
 
+
+  const handleUserClick = async (contactId) => {
+    try {
+      const res = await axios.post('http://localhost:5000/user/add_contact',
+        { contactId: contactId },
+        {
+          headers: {
+            Authorization: `Bearer ${localToken}`
+          }
+        }
+      )
+      console.log(res.data);
+      setIsUpdated(prev => !prev);
+      toggleModal();
+    } catch(err) {
+      console.error("An error occured while adding contact =", err);
+    }
+  }
+
   return (
     <>
       <Dialog open={isModalOpen}>
@@ -68,7 +90,7 @@ export default function AddContactModal({ isModalOpen, toggleModal }) {
           />
           <ul>
             {result.map((user) => (
-              <li key={user.id} className='w-100 m-1 p-2 bg-gray-100 border-2 rounded-lg hover:cursor-pointer'>{user.name} - {user.email}</li>
+              <li key={user._id} className='w-100 m-1 p-2 bg-gray-100 border-2 rounded-lg hover:cursor-pointer' onClick={() => handleUserClick(user._id)}>{user.name} - {user.email}</li>
             ))}
           </ul>
         </DialogBody>
@@ -89,4 +111,5 @@ export default function AddContactModal({ isModalOpen, toggleModal }) {
 AddContactModal.propTypes = {
   isModalOpen: PropTypes.bool.isRequired,
   toggleModal: PropTypes.func.isRequired,
+  setIsUpdated: PropTypes.bool.isRequired,
 };
