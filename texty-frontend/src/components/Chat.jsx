@@ -18,8 +18,8 @@ export default function Chat() {
         Text area
       </div>
       {/* Text input */}
-      <div className="bg-slate-500 p-4 flex">
-        <input placeholder="Enter text here" className="w-full p-2 rounded-md focus:outline-0 flex-grow me-2" />
+      <div className="bg-slate-200 p-4 flex">
+        <input placeholder="Enter text here" className="w-full p-2 rounded-lg font-semibold flex-grow me-2" />
         <div className="rounded-full flex justify-center items-center p-3 bg-white">
           <SendIcon />
         </div>
