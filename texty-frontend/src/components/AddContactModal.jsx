@@ -112,5 +112,5 @@ export default function AddContactModal({ isModalOpen, toggleModal, setIsUpdated
 AddContactModal.propTypes = {
   isModalOpen: PropTypes.bool.isRequired,
   toggleModal: PropTypes.func.isRequired,
-  setIsUpdated: PropTypes.bool.isRequired,
+  setIsUpdated: PropTypes.func,
 };

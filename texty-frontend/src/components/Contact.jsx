@@ -31,7 +31,9 @@ export default function Contact() {
       }
     };
 
-    fetchContacts();
+    if(isLoggedIn) {
+      fetchContacts();
+    }
   }, [isUpdated, localToken, isLoggedIn]);
 
   const handleItemClick = (userId, userName, userEmail) => {
