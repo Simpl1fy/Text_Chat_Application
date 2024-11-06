@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useAuth } from '../context/useAuth';
 import { useModal } from '../context/MondalContext';
 import AddContactModal from './AddContactModal';
+import { useNavigate } from 'react-router-dom';
 
 export default function Contact() {
 
@@ -13,6 +14,8 @@ export default function Contact() {
 
   const [contacts, setContacts] = useState([]);
   const [isUpdated, setIsUpdated] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchContacts = async() => {
@@ -31,6 +34,10 @@ export default function Contact() {
     fetchContacts();
   }, [isUpdated, localToken, isLoggedIn]);
 
+  const handleItemClick = (userId, userName, userEmail) => {
+    navigate(`/chat/${userId}`, { state: { receiverId: userId, userName: userName, userEmail: userEmail } });
+  }
+
   return (
     <div className='h-dvh relative'>
       <nav className="py-3.5 px-4 bg-white shadow-md mb-2">
@@ -42,7 +49,7 @@ export default function Contact() {
         <ul>
           {
             contacts.map((contact) => (
-              <li key={contact._id} className="p-3 mb-2 bg-slate-300 mx-4 rounded-lg hover:cursor-pointer">
+              <li key={contact._id} className="p-3 mb-2 bg-slate-300 mx-4 rounded-lg hover:cursor-pointer" onClick={() => handleItemClick(contact._id, contact.name, contact.email)}>
                 <p className='font-bold text-xl'>{contact.name}</p>
                 <p>{contact.email}</p>
               </li>

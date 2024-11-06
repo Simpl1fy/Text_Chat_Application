@@ -14,6 +14,7 @@ import Signin from './components/Signin';
 import { AuthProvider } from './context/useAuth';
 import { MobileProvider } from './context/useIsMobile';
 import { ModalProvider } from './context/MondalContext';
+import Chat from './components/Chat';
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
       {
         path: '/signin',
         element: <Signin />
+      },
+      {
+        path: '/chat/:id',
+        element: <Chat/>
       },
       {
         index: true,
