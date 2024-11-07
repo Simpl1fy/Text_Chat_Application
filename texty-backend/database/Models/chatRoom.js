@@ -35,4 +35,4 @@ chatRoomSchema.statics.findOrCreateRoom = async function (participant1Id, partic
 
 const ChatRoom = mongoose.model('ChatRoom', chatRoomSchema);
 
-module.exports = ChatRoom;g
+module.exports = ChatRoom;

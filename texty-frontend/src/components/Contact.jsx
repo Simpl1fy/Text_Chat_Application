@@ -33,6 +33,8 @@ export default function Contact() {
 
     if(isLoggedIn) {
       fetchContacts();
+    } else {
+      setContacts([]);
     }
   }, [isUpdated, localToken, isLoggedIn]);
 

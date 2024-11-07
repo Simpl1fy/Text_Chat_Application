@@ -29,6 +29,9 @@ app.get('/', (req, res) => {
 const userRoutes = require('./routes/userRoutes');
 app.use('/user', userRoutes);
 
+const chatRoutes = require('./routes/chatRoutes');
+app.use('/chat', chatRoutes);
+
 const server = http.createServer(app);
 setUpWebSocket(server);
 
