@@ -28,29 +28,29 @@ router.post('/signup', async(req, res) => {
     }
 })
 
-    router.post('/login', async(req, res) => {
-        try {
-            const {email, password} = req.body;
-            const user = await User.findOne({email: email});
+router.post('/login', async(req, res) => {
+    try {
+        const {email, password} = req.body;
+        const user = await User.findOne({email: email});
 
-            if(!user) {
-                return res.status(404).json({"message": "Given Email is not valid"});
-            }
-            if(!(await user.comparePassword(password))) {
-                return res.status(401).json({"message": "Given Password is incorrect"});
-            }
-            const payload = {
-                id: user.id,
-                email: user.email
-            }
-            const token = generateToken(payload);
-            console.log("Token has been generated = ", token);
-            res.status(200).json({"token": token});
-        } catch(err) {
-            console.log(err);
-            res.status(500).json({"error": "Internal server error"});
+        if(!user) {
+            return res.status(404).json({"message": "Given Email is not valid"});
         }
-    });
+        if(!(await user.comparePassword(password))) {
+            return res.status(401).json({"message": "Given Password is incorrect"});
+        }
+        const payload = {
+            id: user.id,
+            email: user.email
+        }
+        const token = generateToken(payload);
+        console.log("Token has been generated = ", token);
+        res.status(200).json({"token": token});
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({"error": "Internal server error"});
+    }
+});
 
 router.post('/add_contact', jwtAuthMiddleware, async(req, res) => {
     try {
