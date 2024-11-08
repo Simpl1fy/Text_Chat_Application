@@ -1,6 +1,8 @@
 import { useLocation } from "react-router-dom";
 import SendIcon from '@mui/icons-material/Send';
 import { useEffect, useState } from "react";
+import { useAuth } from "../context/useAuth";
+import axios from "axios";
 
 export default function Chat() {
 
@@ -11,34 +13,88 @@ export default function Chat() {
   const [message, setMessage] = useState('');   // For storing the current message written by the user.
   const [messages, setMessages] = useState([]); // stores all the messages in an array
 
+
+  const { localToken } = useAuth();
+  const [activeRoom, setActiveRoom] = useState();
+
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:5000");
-    setWs(socket);
+    const fetchRooms = async () => {
+      try {
+        const response = await axios.post("http://localhost:5000/chat/room", {
+          otherUserId: data.receiverId
+        }, {
+          headers: {
+            Authorization: `Bearer ${localToken}`
+          }
+        });
+        console.log(response.data);
+        setActiveRoom(response.data);
 
-    socket.onopen = () => {
-      console.log('WebSocket is connected');
-    }
-
-    socket.onmessage = (msg) => {
-      const newMessage = JSON.parse(msg.data);
-      console.log(newMessage.text);
-      setMessages((prevMessages) => [...prevMessages, newMessage.text]);
-    };
-
-    socket.onerror = (err) => { console.error(err); }
-
-    socket.onclose = () => {
-      console.log("Websocket is closed");
-    }
-    return () => {
-      if(socket) {
-        socket.close();
+      } catch(err) {
+        console.error("Error while fetching the room =", err);
       }
-    };
-  }, []);
+    }
+    fetchRooms();
+  }, [localToken]);
+
+
+  useEffect(() => {
+    let socket = null;
+    if(activeRoom) {
+      socket = new WebSocket(`ws://localhost:5000?token=${localToken}&roomId=${activeRoom.room_id}`)
+      setWs(socket);
+      socket.onmessage = (event) => {
+        const newMessage = JSON.parse(event.data);
+        setMessages(prevMessages => [...prevMessages, newMessage]);
+      };
+
+      socket.onclose = () => {
+        console.log("Websocket connection closed");
+      }
+    }
+
+    return () => {
+      if(ws) {
+        ws.close();
+      }
+    }
+  }, [activeRoom, localToken]);
+
+  // useEffect(() => {
+  //   const socket = new WebSocket("ws://localhost:5000");
+  //   setWs(socket);
+
+  //   socket.onopen = () => {
+  //     console.log('WebSocket is connected');
+  //   }
+
+  //   socket.onmessage = (msg) => {
+  //     const newMessage = JSON.parse(msg.data);
+  //     console.log(newMessage.text);
+  //     setMessages((prevMessages) => [...prevMessages, newMessage.text]);
+  //   };
+
+  //   socket.onerror = (err) => { console.error(err); }
+
+  //   socket.onclose = () => {
+  //     console.log("Websocket is closed");
+  //   }
+  //   return () => {
+  //     if(socket) {
+  //       socket.close();
+  //     }
+  //   };
+  // }, []);
+
+  // const sendMessage = () => {
+  //   if (ws && message) {
+  //     ws.send(message);
+  //     setMessage('');
+  //   }
+  // }
 
   const sendMessage = () => {
-    if (ws && message) {
+    if(activeRoom && ws && message.trim()) {
       ws.send(message);
       setMessage('');
     }
