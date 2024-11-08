@@ -92,11 +92,11 @@ function setUpWebSocket(server) {
             ws.on('close', () => {
                 userConnections.delete(userId);
                 userRooms.delete(userId);
-                const roomUsers = activeRooms.get(roomId);
+                const roomUsers = activeRoom.get(roomId);
                 if (roomUsers) {
                     roomUsers.delete(userId);
                     if (roomUsers.size === 0) {
-                        activeRooms.delete(roomId);
+                        activeRoom.delete(roomId);
                     }
                 }
             }); 
