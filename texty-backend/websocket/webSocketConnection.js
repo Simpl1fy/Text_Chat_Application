@@ -47,17 +47,13 @@ function setUpWebSocket(server) {
             }
             activeRoom.get(roomId).add(userId);
 
-            ws.send(JSON.stringify({
-                type: 'system',
-                message: 'Connected successfully',
-                roomId,
-                timestamp: new Date().toISOString()
-            }));
+            ws.send("Connection to WebSocket Succesful");
 
             // Handle messages
             ws.on('message', async (message) => {
                 try {
-                    const parsedMessage = JSON.parse(message);
+                    console.log(`Received message is = ${message.toString()}`);
+                    const msgToSend = JSON.stringify({ text: message.toString() });
                     const room = await ChatRoom.findById(roomId);
                     
                     if (!room) {
@@ -71,12 +67,7 @@ function setUpWebSocket(server) {
                     // Send message to other participant if they're connected
                     const otherUserWs = userConnections.get(otherUserId);
                     if (otherUserWs && otherUserWs.readyState === WebSocket.OPEN) {
-                        otherUserWs.send(JSON.stringify({
-                            type: 'message',
-                            from: userId,
-                            text: parsedMessage.text,
-                            timestamp: new Date().toISOString()
-                        }));
+                        otherUserWs.send(msgToSend);
                     }
 
                     // Update last activity
