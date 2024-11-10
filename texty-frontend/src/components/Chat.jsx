@@ -44,8 +44,17 @@ export default function Chat() {
       socket = new WebSocket(`ws://localhost:5000?token=${localToken}&roomId=${activeRoom.room_id}`)
       setWs(socket);
       socket.onmessage = (event) => {
-        const newMessage = JSON.parse(event.data);
-        setMessages(prevMessages => [...prevMessages, newMessage]);
+        console.log(event.data);
+        try {
+          const newMessage = JSON.parse(event.data);
+          if(newMessage && newMessage.type === 'connection') {
+            console.log(newMessage.message);
+          } else {
+            setMessages(prevMessages => [...prevMessages, newMessage]);
+          }
+        } catch(err) {
+          console.error("An error occured during onmessage event =", err);
+        }
       };
 
       socket.onclose = () => {

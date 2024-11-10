@@ -47,7 +47,7 @@ function setUpWebSocket(server) {
             }
             activeRoom.get(roomId).add(userId);
 
-            ws.send("Connection to WebSocket Succesful");
+            ws.send(JSON.stringify({ type: 'connection', message: 'Connection to websocket successful'}));
 
             // Handle messages
             ws.on('message', async (message) => {
