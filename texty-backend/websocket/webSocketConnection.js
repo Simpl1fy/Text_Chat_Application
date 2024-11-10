@@ -67,6 +67,7 @@ function setUpWebSocket(server) {
                     // Send message to other participant if they're connected
                     const otherUserWs = userConnections.get(otherUserId);
                     if (otherUserWs && otherUserWs.readyState === WebSocket.OPEN) {
+                        ws.send(msgToSend);
                         otherUserWs.send(msgToSend);
                     }
 

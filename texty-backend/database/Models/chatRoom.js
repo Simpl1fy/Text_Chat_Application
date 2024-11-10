@@ -6,7 +6,7 @@ const chatRoomSchema = new mongoose.Schema({
     lastActivity: { type: Date, default: Date.now },
 });
 
-chatRoomSchema.index({ participants: 1 }, { unique: true });
+chatRoomSchema.index({ participants: 1 });
 
 chatRoomSchema.statics.findOrCreateRoom = async function (participant1Id, participant2Id) {
     const participants = [participant1Id, participant2Id].sort();
