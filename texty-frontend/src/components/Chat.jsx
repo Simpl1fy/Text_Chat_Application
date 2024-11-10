@@ -119,7 +119,7 @@ export default function Chat() {
       {/* Chat */}
       <div className="flex-grow">
         {messages.map((msg, index) => (
-          <p key={index}>{msg}</p>
+          <p key={index}>{msg.text}</p>
         ))}
       </div>
       {/* Text input */}
