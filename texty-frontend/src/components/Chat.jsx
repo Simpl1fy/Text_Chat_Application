@@ -37,6 +37,15 @@ export default function Chat() {
     fetchRooms();
   }, [localToken]);
 
+  // useEffect(() => {
+  //   const fetchMessages = async() => {
+
+  //   }
+  //   return () => {
+      
+  //   };
+  // }, []);
+
 
   useEffect(() => {
     let socket = null;
@@ -120,7 +129,7 @@ export default function Chat() {
       <div className="flex-grow">
         <ul className="list-none">
           {messages.map((msg, index) => (
-            <li key={index} className="border rounded-lg p-2 my-2 ms-2 break-words w-6/12 bg-lime-100 drop-shadow-md">{msg.text}</li>
+            <li key={index} className="border rounded-lg p-2 my-2 ms-2 break-words md:w-6/12 bg-lime-100 drop-shadow-md">{msg.text}</li>
           ))}
         </ul>
       </div>
