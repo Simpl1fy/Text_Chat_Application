@@ -1,6 +1,7 @@
 const WebSocket = require('ws');
 const jwt = require('jsonwebtoken');
 const ChatRoom = require('../database/Models/chatRoom');
+const Message = require('../database/Models/message');
 
 const userConnections = new Map();
 const userRooms = new Map();
@@ -63,6 +64,22 @@ function setUpWebSocket(server) {
 
                     // Get the other participant
                     const otherUserId = room.participants.find(p => p !== userId);
+
+                    // Saving the text into the message document
+                    const response = await Message.findOneAndUpdate(
+                        {
+                            roomId: { $all: roomId }
+                        },
+                        {
+                            $push: { text: message.toString() }
+                        },
+                        {
+                            new: true,
+                            upsert: true
+                        }
+                    );
+
+                    console.log("New Message saved =", response);
                     
                     // Send message to other participant if they're connected
                     const otherUserWs = userConnections.get(otherUserId);
