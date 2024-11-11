@@ -37,14 +37,34 @@ export default function Chat() {
     fetchRooms();
   }, [localToken]);
 
-  // useEffect(() => {
-  //   const fetchMessages = async() => {
+  useEffect(() => {
+    const fetchMessages = async() => {
+      try {
+        const res = await axios.get("http://localhost:5000/chat/fetch", {
+          params: {
+            roomId: activeRoom.room_id
+          }
+        });
+        if(res && res.data) {
+          setMessages(prevMessages => [...prevMessages, ...res.data]);
+        } else {
+          console.log("Error: Response did not contain any messages");
+        }
+      } catch(err) {
+        console.error("An error occured while fetching messages from the server =", err);
+      }
+    }
+    
+    let timer = setTimeout(() => {
+      if(activeRoom) {
+        fetchMessages();
+      }else {
+        console.log("activeRoom is not set yet");
+      }
+    }, 2000);
 
-  //   }
-  //   return () => {
-      
-  //   };
-  // }, []);
+    return () => clearTimeout(timer);
+  }, [localToken, activeRoom]);
 
 
   useEffect(() => {
@@ -129,7 +149,7 @@ export default function Chat() {
       <div className="flex-grow">
         <ul className="list-none">
           {messages.map((msg, index) => (
-            <li key={index} className="border rounded-lg p-2 my-2 ms-2 break-words md:w-6/12 bg-lime-100 drop-shadow-md">{msg.text}</li>
+            <li key={index} className="border rounded-lg p-2 my-2 ms-2 break-words md:w-6/12 bg-lime-100 drop-shadow-md">{msg}</li>
           ))}
         </ul>
       </div>

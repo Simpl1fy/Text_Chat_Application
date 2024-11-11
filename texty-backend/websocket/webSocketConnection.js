@@ -54,7 +54,7 @@ function setUpWebSocket(server) {
             ws.on('message', async (message) => {
                 try {
                     console.log(`Received message is = ${message.toString()}`);
-                    const msgToSend = JSON.stringify({ text: message.toString() });
+                    const msgToSend = JSON.stringify(message.toString());
                     const room = await ChatRoom.findById(roomId);
                     
                     if (!room) {

@@ -31,7 +31,7 @@ router.post('/room', jwtAuthMiddleware, async(req, res) => {
 
 router.get('/fetch', async (req, res) => {
     try {
-        const { roomId } = req.body;
+        const roomId = req.query.roomId;
         if(!roomId) {
             console.log("No room id provided");
             return res.status(401).json({"error": "No room id sent"})
