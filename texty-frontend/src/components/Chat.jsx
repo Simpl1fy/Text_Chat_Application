@@ -118,13 +118,15 @@ export default function Chat() {
       </nav>
       {/* Chat */}
       <div className="flex-grow">
-        {messages.map((msg, index) => (
-          <p key={index}>{msg.text}</p>
-        ))}
+        <ul className="list-none">
+          {messages.map((msg, index) => (
+            <li key={index} className="border rounded-lg p-2 my-2 ms-2 break-words w-6/12 bg-lime-100">{msg.text}</li>
+          ))}
+        </ul>
       </div>
       {/* Text input */}
       <div className="bg-slate-200 p-4 flex">
-        <input placeholder="Enter text here" className="w-full p-2 rounded-lg font-semibold flex-grow me-2" onChange={(e) => setMessage(e.target.value)} value={message} onKeyDown={(e) => {
+        <input placeholder="Enter text here" className="w-full p-2 rounded-lg flex-grow me-2" onChange={(e) => setMessage(e.target.value)} value={message} onKeyDown={(e) => {
           if (e.key === "Enter") {
             sendMessage();
           }

@@ -69,6 +69,8 @@ function setUpWebSocket(server) {
                     if (otherUserWs && otherUserWs.readyState === WebSocket.OPEN) {
                         ws.send(msgToSend);
                         otherUserWs.send(msgToSend);
+                    } else {
+                        ws.send(msgToSend);
                     }
 
                     // Update last activity
