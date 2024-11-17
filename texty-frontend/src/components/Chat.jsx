@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import SendIcon from '@mui/icons-material/Send';
-import { Button } from "@material-tailwind/react"
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { Button, Alert } from "@material-tailwind/react"
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/useAuth";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
@@ -15,7 +16,8 @@ export default function Chat() {
   const [message, setMessage] = useState('');   // For storing the current message written by the user.
   const [messages, setMessages] = useState([]); // stores all the messages in an array
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isDeleteModalOpen, setisDeleteModalOpen] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
 
   const { localToken } = useAuth();
@@ -133,13 +135,21 @@ export default function Chat() {
   }
 
   const handleChatDeleteButton = () => {
-    toggleModal();
+    if(messages.length === 0) {
+      console.log("Messages is already empty");
+      setShowAlert(true);
+    } else {
+      toggleModal();
+    }
   }
 
-  const toggleModal = () => setIsOpen(!isOpen);
+  const toggleModal = () => setisDeleteModalOpen(!isDeleteModalOpen);
 
   return (
     <div className="flex flex-col h-dvh">
+      <Alert open={showAlert} onClose={() => setShowAlert(false)} variant="outlined"  icon={<ErrorOutlineIcon />} >  
+        There are no messages to delete
+      </Alert>
       {/* Navbar of the chat page */}
       <div className="w-full p-4 bg-white shadow-md flex justify-between">
         <div>
@@ -148,7 +158,7 @@ export default function Chat() {
         </div>
         <div>
           <Button onClick={handleChatDeleteButton}>Delete Chat</Button>
-          <DeleteConfirmationModal open={isOpen} handleOpen={toggleModal} deleteFunction={handleChatDelete} />
+          <DeleteConfirmationModal open={isDeleteModalOpen} handleOpen={toggleModal} deleteFunction={handleChatDelete} />
         </div>
       </div>
       {/* Chat */}
