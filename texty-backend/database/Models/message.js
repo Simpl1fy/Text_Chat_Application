@@ -6,14 +6,24 @@ const messageSchema = new mongoose.Schema({
         ref: 'ChatRoom',
         unique: true
     },
-    text: [{
-        type: String,
-        required: true
-    }, {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    }],
+    messages: [
+        {
+            text: {
+                type: String,
+                required: true
+            },
+            senderId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+                required: true
+            },
+            msgTimeStamp: {
+                type: Date,
+                default: Date.now(),
+                required: true
+            }
+        }
+    ],
     timeStamp: {
         type: Date,
         default: Date.now,
