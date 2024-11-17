@@ -12,12 +12,12 @@ export default function DeleteConfirmationModal({ open, handleOpen, deleteFuncti
   return (
     <div>
       <Dialog open={open} handler={handleOpen}>
-        <DialogHeader>Are you sure you want to delete chat?</DialogHeader>
-        <DialogBody>This is unrecoverable</DialogBody>
+        <DialogHeader>Delete Chat?</DialogHeader>
+        <DialogBody>Are you sure you want to delete chat? This is an unrecoverble action.</DialogBody>
         <DialogFooter>
           <Button
             variant="text"
-            color="green"
+            color="blue"
             onClick={handleOpen}
           >
             Cancel
