@@ -1,7 +1,9 @@
 import { useLocation } from "react-router-dom";
 import SendIcon from '@mui/icons-material/Send';
+import { Button } from "@material-tailwind/react"
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/useAuth";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import axios from "axios";
 
 export default function Chat() {
@@ -12,6 +14,8 @@ export default function Chat() {
   const [ws, setWs] = useState(null);           // Storing the websocket object
   const [message, setMessage] = useState('');   // For storing the current message written by the user.
   const [messages, setMessages] = useState([]); // stores all the messages in an array
+
+  const [isOpen, setIsOpen] = useState(false);
 
 
   const { localToken } = useAuth();
@@ -38,6 +42,7 @@ export default function Chat() {
   }, [localToken]);
 
   useEffect(() => {
+    console.log("Useeffect for updating chat messages is running");
     const fetchMessages = async() => {
       try {
         const res = await axios.get("http://localhost:5000/chat/fetch", {
@@ -98,39 +103,6 @@ export default function Chat() {
     }
   }, [activeRoom, localToken]);
 
-  // useEffect(() => {
-  //   const socket = new WebSocket("ws://localhost:5000");
-  //   setWs(socket);
-
-  //   socket.onopen = () => {
-  //     console.log('WebSocket is connected');
-  //   }
-
-  //   socket.onmessage = (msg) => {
-  //     const newMessage = JSON.parse(msg.data);
-  //     console.log(newMessage.text);
-  //     setMessages((prevMessages) => [...prevMessages, newMessage.text]);
-  //   };
-
-  //   socket.onerror = (err) => { console.error(err); }
-
-  //   socket.onclose = () => {
-  //     console.log("Websocket is closed");
-  //   }
-  //   return () => {
-  //     if(socket) {
-  //       socket.close();
-  //     }
-  //   };
-  // }, []);
-
-  // const sendMessage = () => {
-  //   if (ws && message) {
-  //     ws.send(message);
-  //     setMessage('');
-  //   }
-  // }
-
   const sendMessage = () => {
     if(activeRoom && ws && message.trim()) {
       ws.send(message);
@@ -138,13 +110,47 @@ export default function Chat() {
     }
   }
 
+  const handleChatDelete = async () => {
+    console.log(activeRoom.room_id);
+    let roomId = activeRoom.room_id;
+    try {
+      const res = await axios.post("http://localhost:5000/chat/delete", {
+          roomId: roomId
+        }, {
+          headers: {
+            Authorization: `Bearer ${localToken}`
+          }
+        }
+      );
+      console.log(res.data);
+      if(res.data.success) {
+        setMessages([]);
+      }
+    } catch(err) {
+      console.log("An error occured while deleting chat =", err);
+    }
+    toggleModal();
+  }
+
+  const handleChatDeleteButton = () => {
+    toggleModal();
+  }
+
+  const toggleModal = () => setIsOpen(!isOpen);
+
   return (
     <div className="flex flex-col h-dvh">
       {/* Navbar of the chat page */}
-      <nav className="w-full p-4 bg-white shadow-md">
-        <span className="text-xl font-bold">{data.userName}</span> - 
-        <span className="ms-0.5 text-lg font-medium">{data.userEmail}</span>
-      </nav>
+      <div className="w-full p-4 bg-white shadow-md flex justify-between">
+        <div>
+          <span className="text-xl font-bold">{data.userName}</span> -
+          <span className="ms-0.5 text-lg font-medium">{data.userEmail}</span>
+        </div>
+        <div>
+          <Button onClick={handleChatDeleteButton}>Delete Chat</Button>
+          <DeleteConfirmationModal open={isOpen} handleOpen={toggleModal} deleteFunction={handleChatDelete} />
+        </div>
+      </div>
       {/* Chat */}
       <div className="flex-grow">
         <ul className="list-none">

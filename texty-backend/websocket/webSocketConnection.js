@@ -53,8 +53,10 @@ function setUpWebSocket(server) {
             // Handle messages
             ws.on('message', async (message) => {
                 try {
-                    console.log(`Received message is = ${message.toString()}`);
-                    const msgToSend = JSON.stringify(message.toString());
+                    // console.log(`Received message is = ${message.toString()}`);
+                    const parsedMessage = message.toString();
+                    console.log("Parsed Message is =", parsedMessage);
+                    const msgToSend = JSON.stringify(parsedMessage);
                     const room = await ChatRoom.findById(roomId);
                     
                     if (!room) {
@@ -68,10 +70,10 @@ function setUpWebSocket(server) {
                     // Saving the text into the message document
                     const response = await Message.findOneAndUpdate(
                         {
-                            roomId: { $all: roomId }
+                            roomId: roomId
                         },
                         {
-                            $push: { text: message.toString() }
+                            $push: { text: parsedMessage }
                         },
                         {
                             new: true,
