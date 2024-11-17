@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import SendIcon from '@mui/icons-material/Send';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { Button, Alert } from "@material-tailwind/react"
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth } from "../context/useAuth";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import axios from "axios";
@@ -14,6 +14,7 @@ export default function Chat() {
 
   const [ws, setWs] = useState(null);           // Storing the websocket object
   const [message, setMessage] = useState('');   // For storing the current message written by the user.
+  const messageRef = useRef([]);
   const [messages, setMessages] = useState([]); // stores all the messages in an array
 
   const [isDeleteModalOpen, setisDeleteModalOpen] = useState(false);
@@ -53,7 +54,8 @@ export default function Chat() {
           }
         });
         if(res && res.data) {
-          setMessages(prevMessages => [...prevMessages, ...res.data]);
+          messageRef.current = [...messageRef.current, ...res.data];
+          setMessages([...messageRef.current]);
         } else {
           console.log("Error: Response did not contain any messages");
         }
@@ -86,7 +88,8 @@ export default function Chat() {
           if(newMessage && newMessage.type === 'connection') {
             console.log(newMessage.message);
           } else {
-            setMessages(prevMessages => [...prevMessages, newMessage]);
+            messageRef.current = [...messageRef.current, newMessage];
+            setMessages([...messageRef.current]);
           }
         } catch(err) {
           console.error("An error occured during onmessage event =", err);
@@ -126,6 +129,7 @@ export default function Chat() {
       );
       console.log(res.data);
       if(res.data.success) {
+        messageRef.current = [];
         setMessages([]);
       }
     } catch(err) {
@@ -163,11 +167,16 @@ export default function Chat() {
       </div>
       {/* Chat */}
       <div className="flex-grow">
-        <ul className="list-none">
           {messages.map((msg, index) => (
-            <li key={index} className="border rounded-lg p-2 my-2 ms-2 break-words md:w-6/12 bg-lime-100 drop-shadow-md">{msg.text}</li>
+              <div key={index} className={`flex ${msg.senderId === data.receiverId ? 'justify-start': 'justify-end'}`}>
+                  {/* <div className="mx-2 mb-0">
+                    {msg.senderId === data.receiverId ? `${data.userName}`: 'You'}
+                  </div> */}
+                  <div className={`border rounded-lg p-3 my-2 mx-2 break-words w-max max-w-[85%] drop-shadow-md ${msg.senderId === data.receiverId ? 'bg-lime-100': 'bg-lime-400'}`}>
+                    {msg.text}
+                  </div>
+              </div>
           ))}
-        </ul>
       </div>
       {/* Text input */}
       <div className="bg-slate-200 p-4 flex">
