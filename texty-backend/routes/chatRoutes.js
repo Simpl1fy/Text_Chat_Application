@@ -43,7 +43,7 @@ router.get('/fetch', async (req, res) => {
             return res.status(401).json({"error": "No such room id exists"});
         }
         console.log(room[0]);
-        return res.status(200).json(room[0].text);
+        return res.status(200).json(room[0].messages);
     } catch(err) {
         console.error("An error occured while fetching messages of a room =", err);
         return res.status(500).json({"Error": "Internal Server Error"});
