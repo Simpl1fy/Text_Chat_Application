@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import SendIcon from '@mui/icons-material/Send';
+import {Button} from "@material-tailwind/react"
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/useAuth";
 import axios from "axios";
@@ -38,6 +39,7 @@ export default function Chat() {
   }, [localToken]);
 
   useEffect(() => {
+    console.log("Useeffect for updating chat messages is running");
     const fetchMessages = async() => {
       try {
         const res = await axios.get("http://localhost:5000/chat/fetch", {
@@ -105,13 +107,39 @@ export default function Chat() {
     }
   }
 
+  const handleChatDelete = async() => {
+    console.log(activeRoom.room_id);
+    let roomId = activeRoom.room_id;
+    try {
+      const res = await axios.post("http://localhost:5000/chat/delete", {
+          roomId: roomId
+        }, {
+          headers: {
+            Authorization: `Bearer ${localToken}`
+          }
+        }
+      );
+      console.log(res.data);
+      if(res.data.success) {
+        setMessages([]);
+      }
+    } catch(err) {
+      console.log("An error occured while deleting chat =", err);
+    }
+  }
+
   return (
     <div className="flex flex-col h-dvh">
       {/* Navbar of the chat page */}
-      <nav className="w-full p-4 bg-white shadow-md">
-        <span className="text-xl font-bold">{data.userName}</span> - 
-        <span className="ms-0.5 text-lg font-medium">{data.userEmail}</span>
-      </nav>
+      <div className="w-full p-4 bg-white shadow-md flex justify-between">
+        <div>
+          <span className="text-xl font-bold">{data.userName}</span> -
+          <span className="ms-0.5 text-lg font-medium">{data.userEmail}</span>
+        </div>
+        <div>
+          <Button onClick={handleChatDelete}>Delete Chat</Button>
+        </div>
+      </div>
       {/* Chat */}
       <div className="flex-grow">
         <ul className="list-none">
