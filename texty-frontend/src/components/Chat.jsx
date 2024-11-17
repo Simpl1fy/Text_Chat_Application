@@ -98,39 +98,6 @@ export default function Chat() {
     }
   }, [activeRoom, localToken]);
 
-  // useEffect(() => {
-  //   const socket = new WebSocket("ws://localhost:5000");
-  //   setWs(socket);
-
-  //   socket.onopen = () => {
-  //     console.log('WebSocket is connected');
-  //   }
-
-  //   socket.onmessage = (msg) => {
-  //     const newMessage = JSON.parse(msg.data);
-  //     console.log(newMessage.text);
-  //     setMessages((prevMessages) => [...prevMessages, newMessage.text]);
-  //   };
-
-  //   socket.onerror = (err) => { console.error(err); }
-
-  //   socket.onclose = () => {
-  //     console.log("Websocket is closed");
-  //   }
-  //   return () => {
-  //     if(socket) {
-  //       socket.close();
-  //     }
-  //   };
-  // }, []);
-
-  // const sendMessage = () => {
-  //   if (ws && message) {
-  //     ws.send(message);
-  //     setMessage('');
-  //   }
-  // }
-
   const sendMessage = () => {
     if(activeRoom && ws && message.trim()) {
       ws.send(message);

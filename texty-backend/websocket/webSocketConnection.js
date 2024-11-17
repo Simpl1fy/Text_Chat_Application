@@ -53,8 +53,14 @@ function setUpWebSocket(server) {
             // Handle messages
             ws.on('message', async (message) => {
                 try {
-                    console.log(`Received message is = ${message.toString()}`);
-                    const msgToSend = JSON.stringify(message.toString());
+                    // console.log(`Received message is = ${message.toString()}`);
+                    const parsedMessage = message.toString();
+                    console.log("Parsed Message is =", parsedMessage);
+                    const msgToSend = JSON.stringify({
+                        text: parsedMessage,
+                        senderId: userId,
+                        timeStamp: new Date()
+                    });
                     const room = await ChatRoom.findById(roomId);
                     
                     if (!room) {
@@ -71,7 +77,12 @@ function setUpWebSocket(server) {
                             roomId: { $all: roomId }
                         },
                         {
-                            $push: { text: message.toString() }
+                            $push: {
+                                messages: {
+                                    text: parsedMessage,
+                                    senderId: userId
+                                }
+                            }
                         },
                         {
                             new: true,

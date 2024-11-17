@@ -9,6 +9,10 @@ const messageSchema = new mongoose.Schema({
     text: [{
         type: String,
         required: true
+    }, {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }],
     timeStamp: {
         type: Date,
