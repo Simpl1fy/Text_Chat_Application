@@ -1,8 +1,9 @@
 import { useLocation } from "react-router-dom";
 import SendIcon from '@mui/icons-material/Send';
-import {Button} from "@material-tailwind/react"
+import { Button } from "@material-tailwind/react"
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/useAuth";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import axios from "axios";
 
 export default function Chat() {
@@ -13,6 +14,8 @@ export default function Chat() {
   const [ws, setWs] = useState(null);           // Storing the websocket object
   const [message, setMessage] = useState('');   // For storing the current message written by the user.
   const [messages, setMessages] = useState([]); // stores all the messages in an array
+
+  const [isOpen, setIsOpen] = useState(false);
 
 
   const { localToken } = useAuth();
@@ -107,7 +110,7 @@ export default function Chat() {
     }
   }
 
-  const handleChatDelete = async() => {
+  const handleChatDelete = async () => {
     console.log(activeRoom.room_id);
     let roomId = activeRoom.room_id;
     try {
@@ -126,7 +129,14 @@ export default function Chat() {
     } catch(err) {
       console.log("An error occured while deleting chat =", err);
     }
+    toggleModal();
   }
+
+  const handleChatDeleteButton = () => {
+    toggleModal();
+  }
+
+  const toggleModal = () => setIsOpen(!isOpen);
 
   return (
     <div className="flex flex-col h-dvh">
@@ -137,7 +147,8 @@ export default function Chat() {
           <span className="ms-0.5 text-lg font-medium">{data.userEmail}</span>
         </div>
         <div>
-          <Button onClick={handleChatDelete}>Delete Chat</Button>
+          <Button onClick={handleChatDeleteButton}>Delete Chat</Button>
+          <DeleteConfirmationModal open={isOpen} handleOpen={toggleModal} deleteFunction={handleChatDelete} />
         </div>
       </div>
       {/* Chat */}
