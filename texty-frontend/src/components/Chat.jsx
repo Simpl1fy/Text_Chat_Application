@@ -166,7 +166,7 @@ export default function Chat() {
         </div>
       </div>
       {/* Chat */}
-      <div className="flex-grow">
+      <div className="flex-grow overflow-y-auto">
           {messages.map((msg, index) => (
               <div key={index} className={`flex ${msg.senderId === data.receiverId ? 'justify-start': 'justify-end'}`}>
                   {/* <div className="mx-2 mb-0">
