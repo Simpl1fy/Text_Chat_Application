@@ -6,12 +6,16 @@ import { useAuth } from '../context/useAuth';
 import { useModal } from '../context/MondalContext';
 import AddContactModal from './AddContactModal';
 import { useNavigate } from 'react-router-dom';
+import { Alert } from "@material-tailwind/react";
 
 export default function Contact() {
 
   const { localToken, isLoggedIn } = useAuth();
   const { isModalOpen, toggleModal } = useModal();
-
+  
+  const [resText, setResText] = useState('');
+  const [responseResult, setResponseResult] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const [contacts, setContacts] = useState([]);
   const [isUpdated, setIsUpdated] = useState(false);
   const [searchInput, setSearchInput] = useState('');
@@ -50,8 +54,33 @@ export default function Contact() {
       contact.email.toLowerCase().includes(searchInput.toLowerCase()))
   );
 
+  // Setting auto close for alert
+  useEffect(() => {
+    let timer = setTimeout(() => {
+      if(showAlert) {
+        setShowAlert(false);
+      }
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [showAlert])
+
   return (
     <div className='h-dvh relative'>
+      {
+        showAlert && (
+          responseResult ?
+          (
+            <Alert open={showAlert} onClose={() => setShowAlert(false)} variant='outlined' color='green'>
+              {resText}
+            </Alert>
+          ) : (
+            <Alert open={showAlert} onClose={() => setShowAlert(false)} variant='outlined' color='red'>
+              {resText}
+            </Alert>
+          )
+        ) 
+      }
       <nav className="py-3.5 px-4 bg-white shadow-md mb-2">
           <div className="flex  items-center rounded-lg border-2 border-zinc-600 Ebg-sky-50">
             <div className='px-2'><SearchIcon/></div>
@@ -72,7 +101,7 @@ export default function Contact() {
         <div className='absolute bottom-4 right-2 hover:cursor-pointer' onClick={toggleModal}>
           <AddCircleIcon fontSize='large' />
         </div>
-        <AddContactModal isModalOpen={isModalOpen} toggleModal={toggleModal} setIsUpdated={setIsUpdated} />
+        <AddContactModal isModalOpen={isModalOpen} toggleModal={toggleModal} setIsUpdated={setIsUpdated} setResText={setResText} setResponseResult={setResponseResult} setShowAlert={setShowAlert} />
     </div>
   )
 }

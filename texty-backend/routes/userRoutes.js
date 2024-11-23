@@ -62,18 +62,34 @@ router.post('/add_contact', jwtAuthMiddleware, async(req, res) => {
         
         // Checking if the contact id is present in the req body
         if(!data) {
-            return res.status(401).json({"error": "Contact Id is required"})
+            return res.status(200).json({
+                "success": false,
+                "error": "Contact Id is required"
+            })
         }
         const user = await User.findById(userData.id);
         
         // checking if the user exists by the user id
         if(!user) {
-            return res.status(401).json({"error": "User does not exist"});
+            return res.status(401).json({
+                "success": false,
+                "error": "User does not exist"
+            });
+        }
+
+        if(contactId === user.id) {
+            return res.status(200).json({
+                "success": false,
+                "error": "The contact cannot be the user"
+            })
         }
 
         // checking if the contact already exists
         if(user.contacts.includes(contactId)) {
-            return res.status(401).json({"error": "contact already exists"});
+            return res.status(200).json({
+                "success": false,
+                "error": "Contact already exists"
+            });
         }
 
         // If all the edge cases are checked we add the contact
@@ -81,7 +97,11 @@ router.post('/add_contact', jwtAuthMiddleware, async(req, res) => {
         await user.save();
 
 
-        return res.status(200).json({"message": "Contact Added Succesfully", "contacts": user.contacts});
+        return res.status(200).json({
+            "success": true,
+            "message": "Contact Added Succesfully", 
+            "contacts": user.contacts
+        });
     } catch(err) {
         console.log("An error occured = ", err );
         res.status(500).json({"error": "Internal Server Error"});
