@@ -52,7 +52,7 @@ router.post('/login', async(req, res) => {
     }
 });
 
-
+// route for creating notification
 router.post('/add_contact/create_notification', jwtAuthMiddleware, async(req, res) => {
     try {
         const userData = req.jwtPayload;
@@ -109,6 +109,56 @@ router.post('/add_contact/create_notification', jwtAuthMiddleware, async(req, re
 
 
         return res.status(200).json({"message": "Notification added", "notifications": receiver.notifications});
+    } catch(err) {
+        console.log("An error occured =", err);
+        return res.status(500).json({"error": "internal server error"});
+    }
+});
+
+// Creating a route for accepting notification
+router.post('/add_contact/accept', jwtAuthMiddleware, async(req, res) => {
+    try {
+        const userData = req.jwtPayload;
+        const { senderId } = req.body;
+
+        // checking if the senderId is received from the body or not
+        if(!senderId) {
+            console.log("Sender id not received");
+            return res.status(400).json({"error": "sender id is required"});
+        }
+
+        // getting the user and sender
+        const user = await User.findById(userData.id);
+        const sender = await User.findById(senderId);
+
+        // error handling
+        if(!user) {
+            return res.status(400).json({"error": "user id not present"});
+        }
+
+        if(!sender) {
+            return res.status(400).json({"error": "sender id is not present"});
+        }
+
+        // remove the object from the notification array of the user
+        user.notifications = user.notifications.filter(notification =>
+            !(notification.userId.toString() === senderId.toString())
+        );
+
+        // add each others id, to the contacts array
+        if(!user.contacts.includes(senderId)) {
+            user.contacts.push(senderId);
+        }
+
+        if(!sender.contacts.includes(userData.id)) {
+            sender.contacts.includes(userData.id);
+        }
+
+        // saving updated documents
+        await user.save();
+        await sender.save();
+
+        return res.status(200).json({'message': 'Notification accepted', user, sender});
     } catch(err) {
         console.log("An error occured =", err);
         return res.status(500).json({"error": "internal server error"});
