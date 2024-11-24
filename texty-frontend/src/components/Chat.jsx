@@ -15,6 +15,7 @@ export default function Chat() {
   const [ws, setWs] = useState(null);           // Storing the websocket object
   const [message, setMessage] = useState('');   // For storing the current message written by the user.
   const messageRef = useRef([]);
+  const chatContainerRef = useRef(null);
   const [messages, setMessages] = useState([]); // stores all the messages in an array
 
   const [isDeleteModalOpen, setisDeleteModalOpen] = useState(false);
@@ -23,6 +24,12 @@ export default function Chat() {
 
   const { localToken } = useAuth();
   const [activeRoom, setActiveRoom] = useState();
+
+  useEffect(() => {
+    if(chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages])
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -166,7 +173,7 @@ export default function Chat() {
         </div>
       </div>
       {/* Chat */}
-      <div className="flex-grow overflow-y-auto">
+      <div className="flex-grow overflow-y-auto" ref={chatContainerRef}>
           {messages.map((msg, index) => (
               <div key={index} className={`flex ${msg.senderId === data.receiverId ? 'justify-start': 'justify-end'}`}>
                   {/* <div className="mx-2 mb-0">
