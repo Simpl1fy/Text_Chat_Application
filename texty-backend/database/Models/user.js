@@ -18,7 +18,24 @@ const userSchema = new mongoose.Schema({
     contacts: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }]
+    }],
+    notifications: [
+        {
+            userName: {
+                type: String,
+                required: true
+            },
+            userEmail: {
+                type: String,
+                required: true
+            },
+            userId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+                required: true
+            }
+        }
+    ]
 });
 
 userSchema.pre('save', async function(next) {
