@@ -55,7 +55,60 @@ router.post('/login', async(req, res) => {
 
 router.post('/add_contact/create_notification', jwtAuthMiddleware, async(req, res) => {
     try {
-        
+        const userData = req.jwtPayload;
+        const { receiverId } = req.body;
+
+        // error checking - Checking if receiverId is received in the body or not
+        if(!receiverId) {
+            console.log("ReceiverId not present in body");
+            return res.status(400).json({'error': 'receiver id is required'});
+        }
+
+        // finding the sender
+        const sender = await User.findById(userData.id);
+        if(!sender) {
+            console.log("Sender Id not found");
+            return res.status(401).json({"error": "sender not found"});
+        }
+
+        // finding the receiver
+        const receiver = await User.findById(receiverId);
+        if(!receiver) {
+            console.log("reciever id not found");
+            return res.status(401).json({'error': 'receiver not found'});
+        }
+
+        // Checking if the receiver already has notification from the sender
+        const notificationExists = await User.findOne({
+            _id: receiverId,
+            notifications: {
+                $elemMatch: {
+                    userName: sender.name,
+                    userEmail: sender.email,
+                    userId: sender.id
+                }
+            }
+        })
+
+        // if notification exists we return
+        if(notificationExists) {
+            return res.status(400).json({"error": "request already sent"});
+        }
+
+        // Adding notification
+        receiver.notifications.push(
+            {
+                userName: sender.name,
+                userEmail: sender.email,
+                userId: sender.id
+            }
+        )
+
+        // Saving the new document with the notification pushed
+        await receiver.save();
+
+
+        return res.status(200).json({"message": "Notification added", "notifications": receiver.notifications});
     } catch(err) {
         console.log("An error occured =", err);
         return res.status(500).json({"error": "internal server error"});
