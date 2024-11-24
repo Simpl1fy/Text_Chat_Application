@@ -52,6 +52,16 @@ router.post('/login', async(req, res) => {
     }
 });
 
+
+router.post('/add_contact/create_notification', jwtAuthMiddleware, async(req, res) => {
+    try {
+        
+    } catch(err) {
+        console.log("An error occured =", err);
+        return res.status(500).json({"error": "internal server error"});
+    }
+})
+
 router.post('/add_contact', jwtAuthMiddleware, async(req, res) => {
     try {
         const userData = req.jwtPayload;
