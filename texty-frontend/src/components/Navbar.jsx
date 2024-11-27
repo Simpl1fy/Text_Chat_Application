@@ -10,6 +10,7 @@ import {
 } from "@material-tailwind/react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleUser, faBars } from '@fortawesome/free-solid-svg-icons';
+import { faBell } from '@fortawesome/free-regular-svg-icons';
 import { useState } from "react";
 import { useAuth } from "../context/useAuth";
 import { useIsMobile } from "../context/useIsMobile";
@@ -65,51 +66,64 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* User Menu & Signup Button */}
-        <div className="hidden md:flex items-center space-x-3 mr-5"> 
-          {!isLoggedIn ? (
-            <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleSignupClick}>
-            Signup
-            </Button>
-          ) : (
+        {/* Navbar Right side */}
+        <div className="flex flex-row">
+          {/* Notification Menu */}
+          <div className="me-2">
             <Menu>
               <MenuHandler>
                 <IconButton className="bg-inherit hover:bg-white/10">
-                  <FontAwesomeIcon icon={faCircleUser} className="fa-xl text-white" />
+                  <FontAwesomeIcon icon={faBell} className="fa-xl" />
                 </IconButton>
               </MenuHandler>
-              <MenuList>
-                <MenuItem>Profile</MenuItem>
-                <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
-              </MenuList>
             </Menu>
-          )}
-        </div>
+          </div>
 
-        {/* Hamburger Menu for Mobile */}
-        <div className="flex md:hidden">
-          <IconButton onClick={toggleDrawer}>
-            <FontAwesomeIcon icon={faBars} className="fa-lg text-white" />
-          </IconButton>
-        </div>
-
-        {/* Drawer Menu */}
-        <Drawer open={drawerOpen} onClose={toggleDrawer} className="p-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
-          <div className="flex flex-col space-y-4">
-            <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleAddContactButton}>Add a Contact</Button>
-            <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>
-              <Link to="https://github.com/Simpl1fy">About Developer</Link>
-            </Button>
-            {isLoggedIn ? (
-              <>
-                <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>Profile</Button>
-                <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleLogoutClick}>Logout</Button>
-              </>
-              ) : (
-              <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleSignupClick}>Signup</Button>
+          {/* User Menu & Signup Button */}
+          <div className="hidden md:flex items-center space-x-3 mr-5">
+            {!isLoggedIn ? (
+              <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleSignupClick}>
+              Signup
+              </Button>
+            ) : (
+              <Menu>
+                <MenuHandler>
+                  <IconButton className="bg-inherit hover:bg-white/10">
+                    <FontAwesomeIcon icon={faCircleUser} className="fa-xl text-white" />
+                  </IconButton>
+                </MenuHandler>
+                <MenuList>
+                  <MenuItem>Profile</MenuItem>
+                  <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
+                </MenuList>
+              </Menu>
             )}
           </div>
-        </Drawer>
+
+          {/* Hamburger Menu for Mobile */}
+          <div className="flex md:hidden">
+            <IconButton onClick={toggleDrawer} className="bg-inherit hover:bg-white/10">
+              <FontAwesomeIcon icon={faBars} className="fa-lg text-white" />
+            </IconButton>
+          </div>
+          {/* Drawer Menu */}
+          <Drawer open={drawerOpen} onClose={toggleDrawer} className="p-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+            <div className="flex flex-col space-y-4">
+              <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleAddContactButton}>Add a Contact</Button>
+              <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>
+                <Link to="https://github.com/Simpl1fy">About Developer</Link>
+              </Button>
+              {isLoggedIn ? (
+                <>
+                  <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>Profile</Button>
+                  <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleLogoutClick}>Logout</Button>
+                </>
+                ) : (
+                <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleSignupClick}>Signup</Button>
+              )}
+            </div>
+          </Drawer>
+        </div>
         <AddContactModal isModalOpen={isModalOpen} toggleModal={toggleModal} />
       </div>
       <Outlet />
