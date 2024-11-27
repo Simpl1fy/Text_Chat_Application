@@ -61,14 +61,20 @@ router.post('/add_contact/create_notification', jwtAuthMiddleware, async(req, re
         // error checking - Checking if receiverId is received in the body or not
         if(!receiverId) {
             console.log("ReceiverId not present in body");
-            return res.status(400).json({'error': 'receiver id is required'});
+            return res.status(400).json({
+                'sucess': false,
+                'error': 'Receiver id is required'
+            });
         }
 
         // finding the sender
         const sender = await User.findById(userData.id);
         if(!sender) {
             console.log("Sender Id not found");
-            return res.status(401).json({"error": "sender not found"});
+            return res.status(401).json({
+                'success': false,
+                "error": "Sender not found"
+            });
         }
 
         
@@ -77,12 +83,18 @@ router.post('/add_contact/create_notification', jwtAuthMiddleware, async(req, re
         const receiver = await User.findById(receiverId);
         if(!receiver) {
             console.log("reciever id not found");
-            return res.status(401).json({'error': 'receiver not found'});
+            return res.status(401).json({
+                'success': false,
+                'error': 'Receiver not found'
+            });
         }
 
         // checking if the sender already has the receiverId as contact
         if(sender.contacts.includes(receiverId)) {
-            return res.status(200).json({'error': 'contact already exists'});
+            return res.status(200).json({
+                'success': false,
+                'error': 'Contact already exists'
+            });
         }
 
         // Checking if the receiver already has notification from the sender
@@ -99,7 +111,10 @@ router.post('/add_contact/create_notification', jwtAuthMiddleware, async(req, re
 
         // if notification exists we return
         if(notificationExists) {
-            return res.status(400).json({"error": "request already sent"});
+            return res.status(400).json({
+                'success': false,
+                "error": "Request already sent"
+            });
         }
 
         // Adding notification
@@ -115,7 +130,11 @@ router.post('/add_contact/create_notification', jwtAuthMiddleware, async(req, re
         await receiver.save();
 
 
-        return res.status(200).json({"message": "Notification added", "notifications": receiver.notifications});
+        return res.status(200).json({
+            'success': true,
+            "message": "Notification sent", 
+            "notifications": receiver.notifications
+        });
     } catch(err) {
         console.log("An error occured =", err);
         return res.status(500).json({"error": "internal server error"});
@@ -210,61 +229,61 @@ router.post('/add_contact/decline', jwtAuthMiddleware, async(req, res) => {
     }
 });
 
-router.post('/add_contact', jwtAuthMiddleware, async(req, res) => {
-    try {
-        const userData = req.jwtPayload;
-        const data = req.body;
-        const contactId = data.contactId;
-        console.log(userData);
-        console.log(contactId);
+// router.post('/add_contact', jwtAuthMiddleware, async(req, res) => {
+//     try {
+//         const userData = req.jwtPayload;
+//         const data = req.body;
+//         const contactId = data.contactId;
+//         console.log(userData);
+//         console.log(contactId);
         
-        // Checking if the contact id is present in the req body
-        if(!data) {
-            return res.status(200).json({
-                "success": false,
-                "error": "Contact Id is required"
-            })
-        }
-        const user = await User.findById(userData.id);
+//         // Checking if the contact id is present in the req body
+//         if(!data) {
+//             return res.status(200).json({
+//                 "success": false,
+//                 "error": "Contact Id is required"
+//             })
+//         }
+//         const user = await User.findById(userData.id);
         
-        // checking if the user exists by the user id
-        if(!user) {
-            return res.status(401).json({
-                "success": false,
-                "error": "User does not exist"
-            });
-        }
+//         // checking if the user exists by the user id
+//         if(!user) {
+//             return res.status(401).json({
+//                 "success": false,
+//                 "error": "User does not exist"
+//             });
+//         }
 
-        if(contactId === user.id) {
-            return res.status(200).json({
-                "success": false,
-                "error": "The contact cannot be the user"
-            })
-        }
+//         if(contactId === user.id) {
+//             return res.status(200).json({
+//                 "success": false,
+//                 "error": "The contact cannot be the user"
+//             })
+//         }
 
-        // checking if the contact already exists
-        if(user.contacts.includes(contactId)) {
-            return res.status(200).json({
-                "success": false,
-                "error": "Contact already exists"
-            });
-        }
+//         // checking if the contact already exists
+//         if(user.contacts.includes(contactId)) {
+//             return res.status(200).json({
+//                 "success": false,
+//                 "error": "Contact already exists"
+//             });
+//         }
 
-        // If all the edge cases are checked we add the contact
-        user.contacts.push(contactId);
-        await user.save();
+//         // If all the edge cases are checked we add the contact
+//         user.contacts.push(contactId);
+//         await user.save();
 
 
-        return res.status(200).json({
-            "success": true,
-            "message": "Contact Added Succesfully", 
-            "contacts": user.contacts
-        });
-    } catch(err) {
-        console.log("An error occured = ", err );
-        res.status(500).json({"error": "Internal Server Error"});
-    } 
-});
+//         return res.status(200).json({
+//             "success": true,
+//             "message": "Contact Added Succesfully", 
+//             "contacts": user.contacts
+//         });
+//     } catch(err) {
+//         console.log("An error occured = ", err );
+//         res.status(500).json({"error": "Internal Server Error"});
+//     } 
+// });
 
 router.get('/contacts', jwtAuthMiddleware, async (req, res) => {
     try {
