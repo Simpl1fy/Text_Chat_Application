@@ -11,18 +11,19 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleUser, faBars } from '@fortawesome/free-solid-svg-icons';
 import { faBell } from '@fortawesome/free-regular-svg-icons';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/useAuth";
 import { useIsMobile } from "../context/useIsMobile";
 import { useModal } from "../context/MondalContext";
 import AddContactModal from "./AddContactModal";
+import axios from "axios";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   // const [isMobile, setIsMobile] = useState(false);
 
-  const { isLoggedIn, signout } = useAuth();
+  const { isLoggedIn, signout, localToken } = useAuth();
   const { isMobile } = useIsMobile();
   const { isModalOpen, toggleModal } = useModal();
 
@@ -50,6 +51,23 @@ export default function Navbar() {
       toggleModal();
     }, [1000]);
   };
+
+  // UseEffect for fetching notifications of user
+  useEffect(() => {
+    const fetchNotifications = async() => {
+      const res = await axios.get("http://localhost:5000/user/get_notifications",
+        {
+          headers: {
+            Authorization: `Bearer ${localToken}`
+          }
+        }
+      );
+      console.log(res);
+    }
+    if(localToken) {
+      fetchNotifications();
+    }
+  }, [localToken]);
 
   return (
     <>
