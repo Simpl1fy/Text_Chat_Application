@@ -229,6 +229,37 @@ router.post('/add_contact/decline', jwtAuthMiddleware, async(req, res) => {
     }
 });
 
+
+router.get('/get_notifications', jwtAuthMiddleware, async(req, res) => {
+    try {
+        const userId = req.jwtPayload.id;
+
+        if(!userId) {
+            return res.status(400).json({
+                "success": false,
+                "message": "No user Id found"
+            });
+        }
+
+        const user = await User.findById(userId);
+
+        if(!user) {
+            return res.status(400).json({
+                "success": false,
+                "message": "User not found!"
+            })
+        }
+
+        return res.status(200).json({
+            "success": true,
+            "notifications": user.notifications
+        })
+    } catch(err) {
+        console.log("An error occured in route /get_notifications =", err);
+        return res.status(500).json({"error": "Internal Server Error"});
+    }
+})
+
 // router.post('/add_contact', jwtAuthMiddleware, async(req, res) => {
 //     try {
 //         const userData = req.jwtPayload;
