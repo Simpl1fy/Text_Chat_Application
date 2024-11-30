@@ -52,8 +52,8 @@ export default function AddContactModal({ isModalOpen, toggleModal, setIsUpdated
 
   const handleUserClick = async (contactId) => {
     try {
-      const res = await axios.post('http://localhost:5000/user/add_contact',
-        { contactId: contactId },
+      const res = await axios.post('http://localhost:5000/user/add_contact/create_notification',
+        { receiverId: contactId },
         {
           headers: {
             Authorization: `Bearer ${localToken}`
@@ -120,8 +120,8 @@ export default function AddContactModal({ isModalOpen, toggleModal, setIsUpdated
 AddContactModal.propTypes = {
   isModalOpen: PropTypes.bool.isRequired,
   toggleModal: PropTypes.func.isRequired,
-  setIsUpdated: PropTypes.func.isRequired,
-  setResText: PropTypes.func.isRequired,
-  setResponseResult: PropTypes.func.isRequired,
-  setShowAlert: PropTypes.func.isRequired,
+  setIsUpdated: PropTypes.func,
+  setResText: PropTypes.func,
+  setResponseResult: PropTypes.func,
+  setShowAlert: PropTypes.func,
 };

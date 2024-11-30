@@ -9,19 +9,22 @@ import {
   Drawer,
 } from "@material-tailwind/react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleUser, faBars } from '@fortawesome/free-solid-svg-icons';
-import { useState } from "react";
+import { faCircleUser, faBars, faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faBell } from '@fortawesome/free-regular-svg-icons';
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/useAuth";
 import { useIsMobile } from "../context/useIsMobile";
 import { useModal } from "../context/MondalContext";
 import AddContactModal from "./AddContactModal";
+import axios from "axios";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  // const [isMobile, setIsMobile] = useState(false);
+  const [notificationArray, setNotificationArray] = useState([]);
+  const [isNotificationUpdated, setIsNotificationUpdated] = useState(false);
 
-  const { isLoggedIn, signout } = useAuth();
+  const { isLoggedIn, signout, localToken } = useAuth();
   const { isMobile } = useIsMobile();
   const { isModalOpen, toggleModal } = useModal();
 
@@ -50,6 +53,65 @@ export default function Navbar() {
     }, [1000]);
   };
 
+  // UseEffect for fetching notifications of user
+  useEffect(() => {
+    const fetchNotifications = async() => {
+      try{
+        const res = await axios.get("http://localhost:5000/user/get_notifications",
+          {
+            headers: {
+              Authorization: `Bearer ${localToken}`
+            }
+          }
+        );
+        console.log(res.data.notifications);
+        setNotificationArray(res.data.notifications);
+      } catch(err) {
+        console.log("An error occured = " + err);
+      }
+    }
+    if(localToken) {
+      fetchNotifications();
+    }
+  }, [localToken, isNotificationUpdated]);
+
+  const handleAcceptClick = async(senderId) => {
+    try {
+      const response = await axios.post("http://localhost:5000/user/add_contact/accept", {
+        senderId: senderId
+      }, {
+        headers: {
+          Authorization: `Bearer ${localToken}`
+        }
+      });
+      console.log(response.data);
+      if(response.data.success) {
+        setIsNotificationUpdated(prev => !prev);
+      }
+    } catch(err) {
+      console.log("An error occured =", err);
+    }
+  }
+
+  const handleDeclineClick = async (senderId) => {
+    try {
+      const response = await axios.post("http://localhost:5000/user/add_contact/decline", {
+        senderId: senderId
+      }, {
+        headers: {
+          Authorization: `Bearer ${localToken}`
+        }
+      });
+
+      console.log(response.data);
+      if(response.data.success) {
+        setIsNotificationUpdated(prev => !prev);
+      }
+    } catch(err) {
+      console.log("An error occured =", err);
+    }
+  }
+
   return (
     <>
       <div className="w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex justify-between items-center p-4">
@@ -65,51 +127,91 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* User Menu & Signup Button */}
-        <div className="hidden md:flex items-center space-x-3 mr-5"> 
-          {!isLoggedIn ? (
-            <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleSignupClick}>
-            Signup
-            </Button>
-          ) : (
+        {/* Navbar Right side */}
+        <div className="flex flex-row">
+          {/* Notification Menu */}
+          <div className="me-2">
             <Menu>
               <MenuHandler>
                 <IconButton className="bg-inherit hover:bg-white/10">
-                  <FontAwesomeIcon icon={faCircleUser} className="fa-xl text-white" />
+                  <FontAwesomeIcon icon={faBell} className="fa-xl" />
                 </IconButton>
               </MenuHandler>
               <MenuList>
-                <MenuItem>Profile</MenuItem>
-                <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
+                {notificationArray.length > 0 ? 
+                  (
+                    notificationArray.map((notification) => (
+                      <MenuItem key={notification.userId}>
+                        <div className="flex justify-between items-center">
+                          <div className="me-2">
+                            <p className="text-base font-medium">{notification.userName}</p>
+                            <p className="text-sm">{notification.userEmail}</p>
+                          </div>
+                          <div className="flex">
+                            <IconButton variant="gradient" color="green" size="sm" className="me-1" onClick={() => handleAcceptClick(notification.userId)}>
+                              <FontAwesomeIcon icon={faCheck} />
+                            </IconButton>
+                            <IconButton variant="gradient" color="red" size="sm" onClick={() => handleDeclineClick(notification.userId)}>
+                              <FontAwesomeIcon icon={faXmark} />
+                            </IconButton>
+                          </div>
+                        </div>
+                      </MenuItem>
+                    ))
+                  ): 
+                  (
+                    <MenuItem>No notifications</MenuItem>
+                  )
+                }
               </MenuList>
             </Menu>
-          )}
-        </div>
+          </div>
 
-        {/* Hamburger Menu for Mobile */}
-        <div className="flex md:hidden">
-          <IconButton onClick={toggleDrawer}>
-            <FontAwesomeIcon icon={faBars} className="fa-lg text-white" />
-          </IconButton>
-        </div>
-
-        {/* Drawer Menu */}
-        <Drawer open={drawerOpen} onClose={toggleDrawer} className="p-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
-          <div className="flex flex-col space-y-4">
-            <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleAddContactButton}>Add a Contact</Button>
-            <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>
-              <Link to="https://github.com/Simpl1fy">About Developer</Link>
-            </Button>
-            {isLoggedIn ? (
-              <>
-                <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>Profile</Button>
-                <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleLogoutClick}>Logout</Button>
-              </>
-              ) : (
-              <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleSignupClick}>Signup</Button>
+          {/* User Menu & Signup Button */}
+          <div className="hidden md:flex items-center space-x-3 mr-5">
+            {!isLoggedIn ? (
+              <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleSignupClick}>
+              Signup
+              </Button>
+            ) : (
+              <Menu>
+                <MenuHandler>
+                  <IconButton className="bg-inherit hover:bg-white/10">
+                    <FontAwesomeIcon icon={faCircleUser} className="fa-xl text-white" />
+                  </IconButton>
+                </MenuHandler>
+                <MenuList>
+                  <MenuItem>Profile</MenuItem>
+                  <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
+                </MenuList>
+              </Menu>
             )}
           </div>
-        </Drawer>
+
+          {/* Hamburger Menu for Mobile */}
+          <div className="flex md:hidden">
+            <IconButton onClick={toggleDrawer} className="bg-inherit hover:bg-white/10">
+              <FontAwesomeIcon icon={faBars} className="fa-lg text-white" />
+            </IconButton>
+          </div>
+          {/* Drawer Menu */}
+          <Drawer open={drawerOpen} onClose={toggleDrawer} className="p-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+            <div className="flex flex-col space-y-4">
+              <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleAddContactButton}>Add a Contact</Button>
+              <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>
+                <Link to="https://github.com/Simpl1fy">About Developer</Link>
+              </Button>
+              {isLoggedIn ? (
+                <>
+                  <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>Profile</Button>
+                  <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleLogoutClick}>Logout</Button>
+                </>
+                ) : (
+                <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleSignupClick}>Signup</Button>
+              )}
+            </div>
+          </Drawer>
+        </div>
         <AddContactModal isModalOpen={isModalOpen} toggleModal={toggleModal} />
       </div>
       <Outlet />
