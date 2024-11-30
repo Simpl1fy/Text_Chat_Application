@@ -9,7 +9,7 @@ import {
   Drawer,
 } from "@material-tailwind/react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleUser, faBars } from '@fortawesome/free-solid-svg-icons';
+import { faCircleUser, faBars, faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { faBell } from '@fortawesome/free-regular-svg-icons';
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/useAuth";
@@ -21,7 +21,8 @@ import axios from "axios";
 export default function Navbar() {
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  // const [isMobile, setIsMobile] = useState(false);
+  const [notificationArray, setNotificationArray] = useState([]);
+  const [isNotificationUpdated, setIsNotificationUpdated] = useState(false);
 
   const { isLoggedIn, signout, localToken } = useAuth();
   const { isMobile } = useIsMobile();
@@ -55,19 +56,61 @@ export default function Navbar() {
   // UseEffect for fetching notifications of user
   useEffect(() => {
     const fetchNotifications = async() => {
-      const res = await axios.get("http://localhost:5000/user/get_notifications",
-        {
-          headers: {
-            Authorization: `Bearer ${localToken}`
+      try{
+        const res = await axios.get("http://localhost:5000/user/get_notifications",
+          {
+            headers: {
+              Authorization: `Bearer ${localToken}`
+            }
           }
-        }
-      );
-      console.log(res);
+        );
+        console.log(res.data.notifications);
+        setNotificationArray(res.data.notifications);
+      } catch(err) {
+        console.log("An error occured = " + err);
+      }
     }
     if(localToken) {
       fetchNotifications();
     }
-  }, [localToken]);
+  }, [localToken, isNotificationUpdated]);
+
+  const handleAcceptClick = async(senderId) => {
+    try {
+      const response = await axios.post("http://localhost:5000/user/add_contact/accept", {
+        senderId: senderId
+      }, {
+        headers: {
+          Authorization: `Bearer ${localToken}`
+        }
+      });
+      console.log(response.data);
+      if(response.data.success) {
+        setIsNotificationUpdated(prev => !prev);
+      }
+    } catch(err) {
+      console.log("An error occured =", err);
+    }
+  }
+
+  const handleDeclineClick = async (senderId) => {
+    try {
+      const response = await axios.post("http://localhost:5000/user/add_contact/decline", {
+        senderId: senderId
+      }, {
+        headers: {
+          Authorization: `Bearer ${localToken}`
+        }
+      });
+
+      console.log(response.data);
+      if(response.data.success) {
+        setIsNotificationUpdated(prev => !prev);
+      }
+    } catch(err) {
+      console.log("An error occured =", err);
+    }
+  }
 
   return (
     <>
@@ -94,6 +137,33 @@ export default function Navbar() {
                   <FontAwesomeIcon icon={faBell} className="fa-xl" />
                 </IconButton>
               </MenuHandler>
+              <MenuList>
+                {notificationArray.length > 0 ? 
+                  (
+                    notificationArray.map((notification) => (
+                      <MenuItem key={notification.userId}>
+                        <div className="flex justify-between items-center">
+                          <div className="me-2">
+                            <p className="text-base font-medium">{notification.userName}</p>
+                            <p className="text-sm">{notification.userEmail}</p>
+                          </div>
+                          <div className="flex">
+                            <IconButton variant="gradient" color="green" size="sm" className="me-1" onClick={() => handleAcceptClick(notification.userId)}>
+                              <FontAwesomeIcon icon={faCheck} />
+                            </IconButton>
+                            <IconButton variant="gradient" color="red" size="sm" onClick={() => handleDeclineClick(notification.userId)}>
+                              <FontAwesomeIcon icon={faXmark} />
+                            </IconButton>
+                          </div>
+                        </div>
+                      </MenuItem>
+                    ))
+                  ): 
+                  (
+                    <MenuItem>No notifications</MenuItem>
+                  )
+                }
+              </MenuList>
             </Menu>
           </div>
 
