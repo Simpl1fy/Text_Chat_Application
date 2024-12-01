@@ -16,6 +16,7 @@ import { useAuth } from "../context/useAuth";
 import { useIsMobile } from "../context/useIsMobile";
 import { useAlert } from "../context/useAlert";
 import { useModal } from "../context/MondalContext";
+import { useContactUpdate } from "../context/useContactUpdate";
 import AddContactModal from "./AddContactModal";
 import axios from "axios";
 
@@ -27,6 +28,7 @@ export default function Navbar() {
 
   const { isLoggedIn, signout, localToken } = useAuth();
   const { setResText, setShowAlert, setResponseResult } = useAlert();
+  const { setContactIsUpdated } = useContactUpdate();
 
   const { isMobile } = useIsMobile();
   const { isModalOpen, toggleModal } = useModal();
@@ -92,6 +94,7 @@ export default function Navbar() {
         setIsNotificationUpdated(prev => !prev);
         setResText(response.data.message);
         setResponseResult(true);
+        setContactIsUpdated(true);
       } else {
         setResText(response.data.error);
         setResponseResult(false);

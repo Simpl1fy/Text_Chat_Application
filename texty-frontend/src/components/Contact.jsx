@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useAuth } from '../context/useAuth';
 import { useModal } from '../context/MondalContext';
 import { useAlert } from '../context/useAlert';
+import { useContactUpdate } from '../context/useContactUpdate';
 import AddContactModal from './AddContactModal';
 import { useNavigate } from 'react-router-dom';
 import { Alert } from "@material-tailwind/react";
@@ -17,9 +18,10 @@ export default function Contact() {
   const { localToken, isLoggedIn } = useAuth();
   const { isModalOpen, toggleModal } = useModal();
   const { resText, setResText, showAlert, setShowAlert, responseResult, setResponseResult } = useAlert();
+  const { contactIsUpdated } = useContactUpdate();
   
   const [contacts, setContacts] = useState([]);
-  const [isUpdated, setIsUpdated] = useState(false);
+  // const [isUpdated, setIsUpdated] = useState(false);
   const [searchInput, setSearchInput] = useState('');
 
   const navigate = useNavigate();
@@ -43,7 +45,7 @@ export default function Contact() {
     } else {
       setContacts([]);
     }
-  }, [isUpdated, localToken, isLoggedIn]);
+  }, [contactIsUpdated, localToken, isLoggedIn]);
 
   const handleItemClick = (userId, userName, userEmail) => {
     navigate(`/chat/${userId}`, { state: { receiverId: userId, userName: userName, userEmail: userEmail } });
@@ -68,7 +70,7 @@ export default function Contact() {
   }, [showAlert, setShowAlert])
 
   return (
-    <div className='h-dvh relative'>
+    <div className='h-screen relative flex flex-col'>
       {
         showAlert && (
           responseResult ?
@@ -90,20 +92,22 @@ export default function Contact() {
             />
           </div>
         </nav>
-        <ul className='overflow-y-auto'>
-          {
-            filteredContacts.map((contact) => (
-              <li key={contact._id} className="p-3 mb-2 bg-slate-300 mx-4 rounded-lg hover:cursor-pointer" onClick={() => handleItemClick(contact._id, contact.name, contact.email)}>
-                <p className='font-bold text-xl'>{contact.name}</p>
-                <p>{contact.email}</p>
-              </li>
-            ))
-          }
-        </ul>
+        <div className="overflow-y-auto flex-grow">
+          <ul>
+            {
+              filteredContacts.map((contact) => (
+                <li key={contact._id} className="p-3 mb-2 bg-slate-300 mx-4 rounded-lg hover:cursor-pointer" onClick={() => handleItemClick(contact._id, contact.name, contact.email)}>
+                  <p className='font-bold text-xl'>{contact.name}</p>
+                  <p>{contact.email}</p>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
         <div className='absolute bottom-4 right-2 hover:cursor-pointer' onClick={toggleModal}>
           <AddCircleIcon fontSize='large' />
         </div>
-        <AddContactModal isModalOpen={isModalOpen} toggleModal={toggleModal} setIsUpdated={setIsUpdated} setResText={setResText} setResponseResult={setResponseResult} setShowAlert={setShowAlert} />
+        <AddContactModal isModalOpen={isModalOpen} toggleModal={toggleModal} setResText={setResText} setResponseResult={setResponseResult} setShowAlert={setShowAlert} />
     </div>
   )
 }
