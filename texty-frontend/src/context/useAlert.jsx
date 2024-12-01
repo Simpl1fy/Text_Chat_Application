@@ -10,9 +10,9 @@ export function AlertProvider({ children }) {
 
     return (
         <AlertContext.Provider value={{ resText, setResText, showAlert, setShowAlert, responseResult, setResponseResult }}>
-          {children}
+            {children}
         </AlertContext.Provider>
-      );
+    );
 }
 
 AlertProvider.propTypes = {
@@ -22,5 +22,5 @@ AlertProvider.propTypes = {
   
 // Hook to use AuthContext
 export function useAlert() {
-return useContext(AlertContext);
+    return useContext(AlertContext);
 }

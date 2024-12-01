@@ -13,7 +13,7 @@ import axios from 'axios';
 import { useAuth } from '../context/useAuth';
 
   
-export default function AddContactModal({ isModalOpen, toggleModal, setIsUpdated, setResText, setResponseResult, setShowAlert }) {
+export default function AddContactModal({ isModalOpen, toggleModal, setResText, setResponseResult, setShowAlert }) {
 
   const { localToken } = useAuth();
 
@@ -69,7 +69,6 @@ export default function AddContactModal({ isModalOpen, toggleModal, setIsUpdated
         setResText(res.data.error);
       }
       setShowAlert(true);
-      setIsUpdated(prev => !prev);
       toggleModal();
       setResult([]);
     } catch(err) {
@@ -120,7 +119,6 @@ export default function AddContactModal({ isModalOpen, toggleModal, setIsUpdated
 AddContactModal.propTypes = {
   isModalOpen: PropTypes.bool.isRequired,
   toggleModal: PropTypes.func.isRequired,
-  setIsUpdated: PropTypes.func,
   setResText: PropTypes.func,
   setResponseResult: PropTypes.func,
   setShowAlert: PropTypes.func,

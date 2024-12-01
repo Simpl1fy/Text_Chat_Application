@@ -15,6 +15,7 @@ import { AuthProvider } from './context/useAuth';
 import { MobileProvider } from './context/useIsMobile';
 import { ModalProvider } from './context/MondalContext';
 import { AlertProvider } from './context/useAlert';
+import { ContactUpdationProvider } from './context/useContactUpdate';
 import Chat from './components/Chat';
 
 const router = createBrowserRouter([
@@ -51,11 +52,13 @@ createRoot(document.getElementById('root')).render(
     <ThemeProvider>
       <AlertProvider>
         <AuthProvider>
-          <ModalProvider>
-            <MobileProvider>
-              <RouterProvider router={router} />
-            </MobileProvider>
-          </ModalProvider>
+          <ContactUpdationProvider>
+            <ModalProvider>
+              <MobileProvider>
+                <RouterProvider router={router} />
+              </MobileProvider>
+            </ModalProvider>
+          </ContactUpdationProvider>
         </AuthProvider>
       </AlertProvider>
     </ThemeProvider>
