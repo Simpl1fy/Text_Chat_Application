@@ -14,6 +14,7 @@ import Signin from './components/Signin';
 import { AuthProvider } from './context/useAuth';
 import { MobileProvider } from './context/useIsMobile';
 import { ModalProvider } from './context/MondalContext';
+import { AlertProvider } from './context/useAlert';
 import Chat from './components/Chat';
 
 const router = createBrowserRouter([
@@ -48,13 +49,15 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ThemeProvider>
-      <AuthProvider>
-        <ModalProvider>
-          <MobileProvider>
-            <RouterProvider router={router} />
-          </MobileProvider>
-        </ModalProvider>
-      </AuthProvider>
+      <AlertProvider>
+        <AuthProvider>
+          <ModalProvider>
+            <MobileProvider>
+              <RouterProvider router={router} />
+            </MobileProvider>
+          </ModalProvider>
+        </AuthProvider>
+      </AlertProvider>
     </ThemeProvider>
   </StrictMode>,
 )
