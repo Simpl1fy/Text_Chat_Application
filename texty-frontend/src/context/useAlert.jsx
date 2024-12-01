@@ -6,9 +6,10 @@ const AlertContext = createContext();
 export function AlertProvider({ children }) {
     const [resText, setResText] = useState('');
     const [showAlert, setShowAlert] = useState(false);
+    const [responseResult, setResponseResult] = useState(false);
 
     return (
-        <AlertContext.Provider value={{ resText, setResText, showAlert, setShowAlert }}>
+        <AlertContext.Provider value={{ resText, setResText, showAlert, setShowAlert, responseResult, setResponseResult }}>
           {children}
         </AlertContext.Provider>
       );
@@ -20,6 +21,6 @@ AlertProvider.propTypes = {
   
   
 // Hook to use AuthContext
-export function useAuth() {
+export function useAlert() {
 return useContext(AlertContext);
 }

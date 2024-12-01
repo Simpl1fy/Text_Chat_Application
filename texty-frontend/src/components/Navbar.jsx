@@ -14,6 +14,7 @@ import { faBell } from '@fortawesome/free-regular-svg-icons';
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/useAuth";
 import { useIsMobile } from "../context/useIsMobile";
+import { useAlert } from "../context/useAlert";
 import { useModal } from "../context/MondalContext";
 import AddContactModal from "./AddContactModal";
 import axios from "axios";
@@ -25,6 +26,8 @@ export default function Navbar() {
   const [isNotificationUpdated, setIsNotificationUpdated] = useState(false);
 
   const { isLoggedIn, signout, localToken } = useAuth();
+  const { setResText, setShowAlert, setResponseResult } = useAlert();
+
   const { isMobile } = useIsMobile();
   const { isModalOpen, toggleModal } = useModal();
 
@@ -87,7 +90,13 @@ export default function Navbar() {
       console.log(response.data);
       if(response.data.success) {
         setIsNotificationUpdated(prev => !prev);
+        setResText(response.data.message);
+        setResponseResult(true);
+      } else {
+        setResText(response.data.error);
+        setResponseResult(false);
       }
+      setShowAlert(true);
     } catch(err) {
       console.log("An error occured =", err);
     }
@@ -106,7 +115,13 @@ export default function Navbar() {
       console.log(response.data);
       if(response.data.success) {
         setIsNotificationUpdated(prev => !prev);
+        setResText(response.data.message);
+        setResponseResult(true);
+      } else {
+        setResText(response.data.error);
+        setResponseResult(false);
       }
+      setShowAlert(true);
     } catch(err) {
       console.log("An error occured =", err);
     }

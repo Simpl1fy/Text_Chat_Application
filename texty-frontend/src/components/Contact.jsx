@@ -4,18 +4,20 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/useAuth';
 import { useModal } from '../context/MondalContext';
+import { useAlert } from '../context/useAlert';
 import AddContactModal from './AddContactModal';
 import { useNavigate } from 'react-router-dom';
 import { Alert } from "@material-tailwind/react";
+import ExclamationIcon from '../icons/ExclamationIcon';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function Contact() {
 
   const { localToken, isLoggedIn } = useAuth();
   const { isModalOpen, toggleModal } = useModal();
+  const { resText, setResText, showAlert, setShowAlert, responseResult, setResponseResult } = useAlert();
   
-  const [resText, setResText] = useState('');
-  const [responseResult, setResponseResult] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
   const [contacts, setContacts] = useState([]);
   const [isUpdated, setIsUpdated] = useState(false);
   const [searchInput, setSearchInput] = useState('');
@@ -63,7 +65,7 @@ export default function Contact() {
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [showAlert])
+  }, [showAlert, setShowAlert])
 
   return (
     <div className='h-dvh relative'>
@@ -71,11 +73,11 @@ export default function Contact() {
         showAlert && (
           responseResult ?
           (
-            <Alert open={showAlert} onClose={() => setShowAlert(false)} variant='outlined' color='green'>
+            <Alert icon={<ExclamationIcon />} open={showAlert} onClose={() => setShowAlert(false)} variant='gradient' color='green'>
               {resText}
             </Alert>
           ) : (
-            <Alert open={showAlert} onClose={() => setShowAlert(false)} variant='outlined' color='red'>
+            <Alert icon={<FontAwesomeIcon icon={faXmark} />} open={showAlert} onClose={() => setShowAlert(false)} variant='gradient' color='red'>
               {resText}
             </Alert>
           )
