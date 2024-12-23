@@ -79,8 +79,16 @@ export default function Contact() {
   // function for handling right click
   const handleRightClick = (event, contactId) => {
     event.preventDefault();
-    setSelectedContactId(contactId)
-    setMenuPosition({ x: event.pageX, y: event.pageY });
+  
+    // Get the bounding rectangle of the clicked <li>
+    const boundingRect = event.currentTarget.getBoundingClientRect();
+    
+    setMenuPosition({
+      x: event.clientX - boundingRect.left, // X relative to <li>
+      y: event.clientY - boundingRect.top,  // Y relative to <li>
+    });
+
+    setSelectedContactId(contactId);
     setShowMenu(true);
   };
 
@@ -135,15 +143,15 @@ export default function Contact() {
                     <p className='font-bold text-xl'>{contact.name}</p>
                     <p>{contact.email}</p>
                   </div>
+                  {showMenu && selectedContactId === contact._id && 
+                    (
+                      <ContactMenu position={menuPosition} show={showMenu} />
+                    )
+                  }
                 </li>
               ))
             }
           </ul>
-          {showMenu && selectedContactId && 
-            (
-              <ContactMenu position={menuPosition} show={showMenu} />
-            )
-          }
         </div>
         <div className='absolute bottom-4 right-2 hover:cursor-pointer' onClick={toggleModal}>
           <AddCircleIcon fontSize='large' />
