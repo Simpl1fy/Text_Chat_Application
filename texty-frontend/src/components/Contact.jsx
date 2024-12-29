@@ -12,6 +12,8 @@ import { Alert } from "@material-tailwind/react";
 import ExclamationIcon from '../icons/ExclamationIcon';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ThreeDots from '../icons/ThreeDots';
+import { Menu, MenuHandler, Button } from "@material-tailwind/react"
 import ContactMenu from './ContactMenu';
 
 export default function Contact() {
@@ -25,10 +27,6 @@ export default function Contact() {
   // const [isUpdated, setIsUpdated] = useState(false);
   const [searchInput, setSearchInput] = useState('');
 
-  // context for menu opening
-  const [showMenu, setShowMenu] = useState(false);
-  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
-  const [selectedContactId, setSelectedContactId] = useState(null);
 
   const navigate = useNavigate();
 
@@ -75,38 +73,9 @@ export default function Contact() {
     return () => clearTimeout(timer);
   }, [showAlert, setShowAlert]);
 
-
-  // function for handling right click
-  const handleRightClick = (event, contactId) => {
-    event.preventDefault();
-  
-    // Get the bounding rectangle of the clicked <li>
-    const boundingRect = event.currentTarget.getBoundingClientRect();
-    
-    setMenuPosition({
-      x: event.clientX - boundingRect.left, // X relative to <li>
-      y: event.clientY - boundingRect.top,  // Y relative to <li>
-    });
-
-    setSelectedContactId(contactId);
-    setShowMenu(true);
-  };
-
-  const handleOutsideClick = () => {
-    setShowMenu(false);
-    setSelectedContactId(null);
-  }
-
-  useEffect(() => {
-    console.log(showMenu);
-    console.log(selectedContactId);
-    console.log(menuPosition)
-  }, [selectedContactId, showMenu, menuPosition]);
-
   return (
     <div
       className='h-screen relative flex flex-col'
-      onClick={handleOutsideClick}
     >
       {
         showAlert && (
@@ -135,7 +104,6 @@ export default function Contact() {
               filteredContacts.map((contact) => (
                 <li 
                   key={contact._id} className="p-3 mb-2 bg-slate-300 mx-4 rounded-lg hover:cursor-pointer group flex justify-between"
-                  onContextMenu={(event) => handleRightClick(event, contact._id)}
                   onClick={() => handleItemClick(contact._id, contact.name, contact.email)}
                 >
                   {/* Contact Info */}
@@ -143,11 +111,14 @@ export default function Contact() {
                     <p className='font-bold text-xl'>{contact.name}</p>
                     <p>{contact.email}</p>
                   </div>
-                  {showMenu && selectedContactId === contact._id && 
-                    (
-                      <ContactMenu position={menuPosition} show={showMenu} />
-                    )
-                  }
+                  <Menu>
+                    <MenuHandler>
+                      <Button variant='text' size='sm' className='rounded-full'>
+                        <ThreeDots/>
+                      </Button>
+                    </MenuHandler>
+                    <ContactMenu />
+                  </Menu>
                 </li>
               ))
             }
