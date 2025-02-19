@@ -13,15 +13,14 @@ import ExclamationIcon from '../icons/ExclamationIcon';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ThreeDots from '../icons/ThreeDots';
-import { Menu, MenuHandler, Button } from "@material-tailwind/react"
-import ContactMenu from './ContactMenu';
+import { Menu, MenuHandler, MenuList, MenuItem, Button } from "@material-tailwind/react"
 
 export default function Contact() {
 
   const { localToken, isLoggedIn } = useAuth();
   const { isModalOpen, toggleModal } = useModal();
   const { resText, setResText, showAlert, setShowAlert, responseResult, setResponseResult } = useAlert();
-  const { contactIsUpdated } = useContactUpdate();
+  const { contactIsUpdated, setContactIsUpdated } = useContactUpdate();
   
   const [contacts, setContacts] = useState([]);
   // const [isUpdated, setIsUpdated] = useState(false);
@@ -73,6 +72,36 @@ export default function Contact() {
     return () => clearTimeout(timer);
   }, [showAlert, setShowAlert]);
 
+
+  const handleDeleteClick = async (event, contactId) => {
+    event.stopPropagation();
+    console.log("Delete clicked");
+
+    try {
+      const res = await axios.post("http://localhost:5000/user/delete/contact", {
+        contactId: contactId,
+      }, {
+        headers: {
+          Authorization: `Bearer ${localToken}`,
+        }
+      });
+      if(res.data.success === true) {
+        console.log("Contact Deleted Successfully");
+        setResText(res.data.message);
+        setResponseResult(true);
+        setShowAlert(true);
+        setContactIsUpdated(!contactIsUpdated);
+      } else {
+        console.log("Failed to delete contact");
+        setResText(res.data.message);
+        setResponseResult(false);
+        setShowAlert(true);
+      }
+    } catch(err) {
+      console.log("An error occured while deleting contact =", err);
+    }
+  }
+
   return (
     <div
       className='h-screen relative flex flex-col'
@@ -117,7 +146,14 @@ export default function Contact() {
                         <ThreeDots/>
                       </Button>
                     </MenuHandler>
-                    <ContactMenu />
+                    <MenuList>
+                      <MenuItem 
+                        className='bg-red-100 hover:bg-red-200'
+                        onClick={(event) => handleDeleteClick(event, contact._id)}
+                      >
+                        Delete Contact
+                      </MenuItem>
+                    </MenuList>
                   </Menu>
                 </li>
               ))
