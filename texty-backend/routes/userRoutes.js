@@ -1,5 +1,7 @@
 const express = require('express');
+// const mongoose = require('mongoose');
 const User = require('../database/Models/user');
+const Chatroom = require('../database/Models/chatRoom');
 const { generateToken, jwtAuthMiddleware} = require('../middleware/jwt');
 
 const router = express.Router();
@@ -398,6 +400,55 @@ router.post('/search_email', async(req, res) => {
         res.status(200).json(users);
     } catch(err) {
         console.log(err);
+        return res.status(500).json({"error": "Internal Server Error"});
+    }
+});
+
+router.post('/delete/contact', jwtAuthMiddleware, async(req, res) => {
+    try {
+        const userData = req.jwtPayload;
+        const { contactId } = req.body;
+
+        const userId = userData.id;
+
+        if(!contactId) {
+            return res.status(400).json({
+                "success": false,
+                "error": "Contact Id is required"
+            });
+        }
+
+        // const userId = new mongoose.ObjectId(userData.id);
+        // const contactObjectId = new mongoose.ObjectId(contactId);
+
+        // console.log("User id = ", userId);
+        // console.log("Contact id = ", contactObjectId);
+
+        const userUpdate = await User.updateOne(
+            {_id: userId},
+            { $pull: { contacts: contactId } }
+        );
+
+        const contactUpdate = await User.updateOne(
+            {_id: contactId},
+            { $pull: { contacts: userData.id } }
+        )
+
+        const chatRoomDelete = await Chatroom.deleteOne({
+            participants: { $all: [userId, contactId] }
+        });
+
+        console.log(userUpdate);
+        console.log(contactUpdate);
+        console.log(chatRoomDelete);
+
+        if (userUpdate.modifiedCount === 0 || contactUpdate.modifiedCount === 0) {
+            return res.status(404).json({ error: "Contact not found or not associated with the user" });
+        }
+
+        return res.status(200).json({ success: true, message: "Contact deleted successfully" });
+    } catch(err) {
+        console.log("An error occured = ", err);
         return res.status(500).json({"error": "Internal Server Error"});
     }
 });
