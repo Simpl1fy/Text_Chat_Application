@@ -18,6 +18,7 @@ import { useAlert } from "../context/useAlert";
 import { useModal } from "../context/MondalContext";
 import { useContactUpdate } from "../context/useContactUpdate";
 import AddContactModal from "./AddContactModal";
+import ProfileModal from "./ProfileModal";
 import axios from "axios";
 
 export default function Navbar() {
@@ -25,6 +26,9 @@ export default function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [notificationArray, setNotificationArray] = useState([]);
   const [isNotificationUpdated, setIsNotificationUpdated] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  const profileModalHandler = () => setIsProfileModalOpen(!isProfileModalOpen);
 
   const { isLoggedIn, signout, localToken } = useAuth();
   const { setResText, setShowAlert, setResponseResult } = useAlert();
@@ -215,7 +219,7 @@ export default function Navbar() {
                   </IconButton>
                 </MenuHandler>
                 <MenuList>
-                  <MenuItem>Profile</MenuItem>
+                  <MenuItem onClick={profileModalHandler}>Profile</MenuItem>
                   <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
                 </MenuList>
               </Menu>
@@ -247,6 +251,7 @@ export default function Navbar() {
           </Drawer>
         </div>
         <AddContactModal isModalOpen={isModalOpen} toggleModal={toggleModal} />
+        <ProfileModal open={isProfileModalOpen} handleModal={profileModalHandler} />
       </div>
       <Outlet />
     </>
