@@ -18,6 +18,7 @@ import { useAlert } from "../context/useAlert";
 import { useModal } from "../context/MondalContext";
 import { useContactUpdate } from "../context/useContactUpdate";
 import AddContactModal from "./AddContactModal";
+import ProfileModal from "./ProfileModal";
 import axios from "axios";
 
 export default function Navbar() {
@@ -25,6 +26,9 @@ export default function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [notificationArray, setNotificationArray] = useState([]);
   const [isNotificationUpdated, setIsNotificationUpdated] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  const profileModalHandler = () => setIsProfileModalOpen(!isProfileModalOpen);
 
   const { isLoggedIn, signout, localToken } = useAuth();
   const { setResText, setShowAlert, setResponseResult } = useAlert();
@@ -52,10 +56,26 @@ export default function Navbar() {
   }
 
   const handleAddContactButton = () => {
-    toggleDrawer();
-    setTimeout(() => {
+    if(isMobile) {
+      toggleDrawer();
+      if(!isLoggedIn) {
+        setResponseResult(false);
+        setResText("Please login to add a contact");
+        setShowAlert(true);
+      } else {
+        setTimeout(() => {
+          toggleModal();
+        }, [1000]);
+      }
+    }
+
+    if(!isLoggedIn) {
+      setResponseResult(false);
+      setResText("Please login to add a contact");
+      setShowAlert(true);
+    } else {
       toggleModal();
-    }, [1000]);
+    }
   };
 
   // UseEffect for fetching notifications of user
@@ -138,7 +158,7 @@ export default function Navbar() {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex border border-white rounded-lg p-2 space-x-4">
-            <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleModal}>Add a Contact</Button>
+            <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleAddContactButton}>Add a Contact</Button>
             <Button className="bg-inherit text-white hover:bg-white/10">
               <Link to="https://github.com/Simpl1fy">About Developer</Link>
             </Button>
@@ -199,7 +219,7 @@ export default function Navbar() {
                   </IconButton>
                 </MenuHandler>
                 <MenuList>
-                  <MenuItem>Profile</MenuItem>
+                  <MenuItem onClick={profileModalHandler}>Profile</MenuItem>
                   <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
                 </MenuList>
               </Menu>
@@ -231,6 +251,7 @@ export default function Navbar() {
           </Drawer>
         </div>
         <AddContactModal isModalOpen={isModalOpen} toggleModal={toggleModal} />
+        <ProfileModal open={isProfileModalOpen} handleModal={profileModalHandler} />
       </div>
       <Outlet />
     </>

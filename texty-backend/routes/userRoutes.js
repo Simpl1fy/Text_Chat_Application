@@ -453,4 +453,37 @@ router.post('/delete/contact', jwtAuthMiddleware, async(req, res) => {
     }
 });
 
+router.get('/profile', jwtAuthMiddleware, async(req, res) => {
+    try {
+        const userId = req.jwtPayload.id;
+
+        if(!userId) {
+            console.log("User id not found!");
+            return res.status(400).json({error: "User Id not found"});
+        }
+
+        console.log("User id =", userId);
+
+        const user = await User.findById(userId);
+        console.log(user);
+
+        if(!user) {
+            console.log("User not found!");
+            return res.status(404).json({
+                success: false,
+                error: "User not found"
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: user,
+            message: "User data fetched successfully"
+        })
+    } catch(err) {
+        console.log("An error occured while fetching profile =", err);
+        return res.status(500).json({error: "Internal Server Error"});
+    }
+})
+
 module.exports = router;
