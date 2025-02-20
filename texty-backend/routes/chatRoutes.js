@@ -53,7 +53,53 @@ router.get('/fetch', async (req, res) => {
         console.error("An error occured while fetching messages of a room =", err);
         return res.status(500).json({"Error": "Internal Server Error"});
     }
-}) 
+})
+
+router.post('/update-seen', jwtAuthMiddleware, async(req, res) => {
+    try {
+        const userId = req.jwtPayload.id;
+        const { roomId } = req.body;
+
+        console.log("User id =", userId);
+        console.log("Room id =", roomId);
+
+        if(!userId) {
+            console.log("User Id not found!");
+            return res.status(200).json({success: false, message: "User Id not found"});
+        }
+
+        if(!roomId) {
+            console.log("Room Id not found!");
+            return res.status(200).json({success: false, message: "Room Id not found"});
+        }
+
+        const messageDoc = await Message.findOne({ roomId });
+
+        console.log("Message Doc =", messageDoc);
+
+        if(!messageDoc) {
+            console.log("No such messages found with the room id");
+            return res.status(200).json({
+                success: false,
+                message: "Failed to update seen id's, no such room id found"
+            })
+        }
+
+        const updatedMessageDoc = await messageDoc.updateOne(
+            { roomId },
+            { $addToSet: { "messages.$[].seenBy": userId } }
+        );
+
+        console.log(updatedMessageDoc);
+
+        return res.status(200).json({
+            success: true,
+            message: "message seen by user updated successfully"
+        })
+    } catch(err) {
+        console.log("An error occured while updating read user Ids =", err);
+    }
+});
 
 router.post('/delete', jwtAuthMiddleware, async(req, res) => {
     try {
