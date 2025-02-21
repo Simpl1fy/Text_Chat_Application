@@ -2,7 +2,10 @@ const express = require('express');
 // const mongoose = require('mongoose');
 const User = require('../database/Models/user');
 const Chatroom = require('../database/Models/chatRoom');
-const { generateToken, jwtAuthMiddleware} = require('../middleware/jwt');
+const { generateToken, jwtAuthMiddleware } = require('../middleware/jwt');
+const cloudinary = require('../middleware/cloudinaryConfig');
+const upload = require('../middleware/multerConfig');
+const fs = require("fs");
 
 const router = express.Router();
 
@@ -482,6 +485,43 @@ router.get('/profile', jwtAuthMiddleware, async(req, res) => {
         })
     } catch(err) {
         console.log("An error occured while fetching profile =", err);
+        return res.status(500).json({error: "Internal Server Error"});
+    }
+})
+
+router.post('/update_profile_picture', jwtAuthMiddleware, upload.single('profileImage'), async(req, res) => {
+    try {
+        const userId = req.jwtPayload.id;
+        if(!req.file) {
+            console.log("no file uploaded");
+            return res.status(400).json({
+                success: false,
+                message: "Invalid file type. No image uploaded"
+            })
+        }
+
+        const filePath = req.file.path;
+
+        const result = await cloudinary.uploader.upload(filePath,{
+            folder: "profile_pictures",
+            allowed_formats: ["jpg", "png"]
+        })
+
+        // deleting the temporary file
+        fs.unlinkSync(filePath);
+
+        const imageURI = result.secure_url;
+
+        // uploading the url of the image in cloudinary
+        await User.findByIdAndUpdate(userId, { profilePicture: imageURI });
+
+        return res.status(200).json({
+            success: true,
+            message: "Profile Picture updated successfully",
+            data: imageURI
+        })
+    } catch(err) {
+        console.log("An error occured while updating profile =", err);
         return res.status(500).json({error: "Internal Server Error"});
     }
 })
