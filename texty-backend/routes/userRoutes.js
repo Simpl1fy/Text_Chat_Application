@@ -489,6 +489,17 @@ router.get('/profile', jwtAuthMiddleware, async(req, res) => {
     }
 })
 
+// function for getting file name from link
+const getFileName = (profileURI) => {
+    if(!profileURI) {
+        console.log("No url found!");
+        return null;
+    }
+
+    var fileName = profileURI.split('/').pop();
+    return fileName.split('.').shift();
+}
+
 router.post('/update_profile_picture', jwtAuthMiddleware, upload.single('profileImage'), async(req, res) => {
     try {
         const userId = req.jwtPayload.id;
@@ -504,6 +515,61 @@ router.post('/update_profile_picture', jwtAuthMiddleware, upload.single('profile
 
         console.log("File Path is =", filePath);
 
+        const user = await User.findById(userId);
+
+        if(!user) {
+            console.log("User document not found!");
+            return res.status(400).json({
+                success: false,
+                message: "User not found!"
+            })
+        }
+
+        console.log("User before updating image link =", user);
+
+
+        if(user.profilePictureURL !== "") {
+
+            console.log("Profile Picture URL is not empty!");
+
+            const existingProfilePictureURI = user.profilePictureURL;
+
+            const fileName = getFileName(existingProfilePictureURI);
+
+            console.log("File name =", fileName);
+
+            // deleting the previosly updated photo
+            const imageDel = await cloudinary.uploader.destroy(
+                [`profile_pictures/${fileName}`], 
+                {
+                    resource_type: 'image'
+                }
+            )
+
+            console.log("Image delete response =", imageDel);
+
+            if(imageDel.result === 'not found') {
+                console.log("Failed to delete existing profile picture");
+                return res.status(400).json({
+                    success: false,
+                    message: "Failed to update profile picture"
+                })
+            }
+
+            // checking for error
+            if(!imageDel) {
+                console.log("Failed to delete existing image from cloudinary");
+                return res.status(400).json({
+                    success: false,
+                    message: "Failed to update image"
+                })
+            }
+
+            console.log("Existing Image deleted of the user");
+        }
+
+
+        // upload the image after checking if there already exists image, deleting it
         const result = await cloudinary.uploader.upload(filePath,{
             folder: "profile_pictures",
             allowed_formats: ["jpg", "png"]
@@ -515,14 +581,15 @@ router.post('/update_profile_picture', jwtAuthMiddleware, upload.single('profile
         const imageURI = result.secure_url;
 
         console.log(imageURI);
-
-        // uploading the url of the image in cloudinary
+        
+        // uploading the url of the image present in cloudinary to mongodb
         const imageRes = await User.findByIdAndUpdate(
             userId,
             { profilePictureURL: imageURI },
             { new: true }
         );
 
+        // checking the response for error
         if(!imageRes) {
             console.log("An error occured while updating profile picture url in mongodb");
             return res.status(400).json({
@@ -542,6 +609,6 @@ router.post('/update_profile_picture', jwtAuthMiddleware, upload.single('profile
         console.log("An error occured while updating profile =", err);
         return res.status(500).json({error: "Internal Server Error"});
     }
-})
+});
 
 module.exports = router;
