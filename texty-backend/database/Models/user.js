@@ -35,7 +35,11 @@ const userSchema = new mongoose.Schema({
                 required: true
             }
         }
-    ]
+    ],
+    profilePictureURL: {
+        type: String,
+        default: "",
+    }
 });
 
 userSchema.pre('save', async function(next) {

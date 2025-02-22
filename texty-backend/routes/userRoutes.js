@@ -502,6 +502,8 @@ router.post('/update_profile_picture', jwtAuthMiddleware, upload.single('profile
 
         const filePath = req.file.path;
 
+        console.log("File Path is =", filePath);
+
         const result = await cloudinary.uploader.upload(filePath,{
             folder: "profile_pictures",
             allowed_formats: ["jpg", "png"]
@@ -512,8 +514,24 @@ router.post('/update_profile_picture', jwtAuthMiddleware, upload.single('profile
 
         const imageURI = result.secure_url;
 
+        console.log(imageURI);
+
         // uploading the url of the image in cloudinary
-        await User.findByIdAndUpdate(userId, { profilePicture: imageURI });
+        const imageRes = await User.findByIdAndUpdate(
+            userId,
+            { profilePictureURL: imageURI },
+            { new: true }
+        );
+
+        if(!imageRes) {
+            console.log("An error occured while updating profile picture url in mongodb");
+            return res.status(400).json({
+                success: true,
+                message: "An error occured while updating profile picture"
+            })
+        }
+
+        console.log("Image update response in mongodb =", imageRes);
 
         return res.status(200).json({
             success: true,
