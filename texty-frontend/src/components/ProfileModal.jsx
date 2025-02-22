@@ -40,7 +40,7 @@ export default function ProfileModal({ open, handleModal }) {
     <>
       <Dialog open={open} handler={handleModal}>
         <DialogHeader>Profile</DialogHeader>
-        <DialogBody className="text-lg text-black">
+        <DialogBody className="text-lg text-black ">
           <div>
             <span className="font-semibold">Name</span> - {profileData.name}
           </div>
