@@ -576,7 +576,13 @@ router.post('/update_profile_picture', jwtAuthMiddleware, upload.single('profile
         })
 
         // deleting the temporary file
-        fs.unlinkSync(filePath);
+        fs.unlink(filePath, (err) => {
+            if (err) {
+                console.error("Error deleting temporary file:", err);
+            } else {
+                console.log("Temporary file deleted successfully");
+            }
+        });
 
         const imageURI = result.secure_url;
 
