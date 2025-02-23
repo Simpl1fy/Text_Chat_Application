@@ -548,7 +548,7 @@ router.post('/update_profile_picture', jwtAuthMiddleware, upload.single('profile
 
             console.log("Image delete response =", imageDel);
 
-            if(imageDel.result === 'not found') {
+            if(imageDel.result !== 'ok') {
                 console.log("Failed to delete existing profile picture");
                 return res.status(400).json({
                     success: false,
