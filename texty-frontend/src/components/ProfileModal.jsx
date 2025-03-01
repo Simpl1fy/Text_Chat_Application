@@ -37,7 +37,7 @@ export default function ProfileModal({ open, handleModal }) {
       console.log("Profile data will be fetched!");
       fetchProfileData();
     }
-  }, []);
+  }, [open]);
 
   useEffect(() => {
     console.log("Profile Data: ", profileData);

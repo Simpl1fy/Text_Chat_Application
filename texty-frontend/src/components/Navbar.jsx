@@ -241,7 +241,7 @@ export default function Navbar() {
               </Button>
               {isLoggedIn ? (
                 <>
-                  <Button className="bg-inherit text-white hover:bg-white/10" onClick={toggleDrawer}>Profile</Button>
+                  <Button className="bg-inherit text-white hover:bg-white/10" onClick={profileModalHandler}>Profile</Button>
                   <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleLogoutClick}>Logout</Button>
                 </>
                 ) : (
