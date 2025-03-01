@@ -102,6 +102,15 @@ export default function Contact() {
     }
   }
 
+  const getProfilePicture = (profilePictureURL, name) => {
+    const nameSplit = name.split(" ");
+    if(profilePictureURL === "") {
+      return `https://ui-avatars.com/api?name=${nameSplit[0]}+${nameSplit[1]}`;
+    } else {
+      return profilePictureURL;
+    }
+  }
+
   return (
     <div
       className='h-screen relative flex flex-col'
@@ -136,9 +145,18 @@ export default function Contact() {
                   onClick={() => handleItemClick(contact._id, contact.name, contact.email)}
                 >
                   {/* Contact Info */}
-                  <div>
-                    <p className='font-bold text-xl'>{contact.name}</p>
-                    <p>{contact.email}</p>
+                  <div className='flex flex-row items-center'>
+                    {/* image */}
+                    <div className='me-[1.25rem]'>
+                      <img
+                        src={getProfilePicture(contact.profilePictureURL, contact.name)}
+                        className='size-10 rounded-full object-cover'
+                      />
+                    </div>
+                    <div className='flex flex-col'>
+                      <span className='font-bold text-lg'>{contact.name}</span>
+                      <span className='text-stone-700'>{contact.email}</span>
+                    </div>
                   </div>
                   <Menu>
                     <MenuHandler>
