@@ -548,7 +548,7 @@ router.post('/update_profile_picture', jwtAuthMiddleware, upload.single('profile
 
             console.log("Image delete response =", imageDel);
 
-            if(imageDel.result === 'not found') {
+            if(imageDel.result !== 'ok') {
                 console.log("Failed to delete existing profile picture");
                 return res.status(400).json({
                     success: false,
@@ -616,5 +616,70 @@ router.post('/update_profile_picture', jwtAuthMiddleware, upload.single('profile
         return res.status(500).json({error: "Internal Server Error"});
     }
 });
+
+router.post('/remove_profile_picture', jwtAuthMiddleware, async(req, res) => {
+    try {
+        const userId = req.jwtPayload.id;
+
+        // fetching user
+        const user = await User.findById(userId);
+
+        if(!user) {
+            console.log("User document not found!");
+            return res.status(400).json({
+                success: false,
+                message: "User not found!"
+            })
+        }
+
+        // profile picture url
+        const profilePictureURI = user.profilePictureURL;
+
+        // file name
+        const fileName = getFileName(profilePictureURI);
+
+        const imageDel = await cloudinary.uploader.destroy(`profile_pictures/${fileName}`, 
+            {
+                resource_type: 'image'
+            }
+        )
+
+        console.log("image delete response =", imageDel);
+
+        if(imageDel.result !== 'ok') {
+            console.log("Failed to delete existing image from cloudinary");
+            return res.status(400).json({
+                success: false,
+                message: "Failed to update image"
+            })
+        }
+
+        // updating the profile picture url to ""
+        const userDocumentUpdate = await User.findByIdAndUpdate(
+            userId,
+            { profilePictureURL: "" },
+            { new: true }
+        )
+
+        console.log("User document after updating =", userDocumentUpdate);
+
+        if(!userDocumentUpdate) {
+            console.log("An error occured while updating profile picture url in mongodb after deleting");
+            return res.status(400).json({
+                success: false,
+                message: "An error occured while removing profile picture"
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Profile Picture removed successfully"
+        })
+
+    } catch(err) {
+        console.log("An error occured while removing profile picture =", err);
+        return res.status(500).json({error: "Internal Server Error"});
+    }
+})
 
 module.exports = router;
