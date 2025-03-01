@@ -367,7 +367,7 @@ router.get('/contacts', jwtAuthMiddleware, async (req, res) => {
         const userData = req.jwtPayload; // Assuming jwtAuthMiddleware attaches userId to req
 
         // Find user and populate contacts
-        const user = await User.findById(userData.id).populate('contacts', 'name email');
+        const user = await User.findById(userData.id).populate('contacts', 'name email profilePictureURL');
         
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
