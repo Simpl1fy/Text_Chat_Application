@@ -467,7 +467,7 @@ router.get('/profile', jwtAuthMiddleware, async(req, res) => {
 
         console.log("User id =", userId);
 
-        const user = await User.findById(userId);
+        const user = await User.findById(userId).select("name email profilePictureURL");
         console.log(user);
 
         if(!user) {
