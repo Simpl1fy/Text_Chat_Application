@@ -7,8 +7,11 @@ import {
   DialogBody,
   DialogFooter,
 } from "@material-tailwind/react";
+// import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import Camera from "../icons/Camera";
+import TrashBin from "../icons/TrashBin";
 import axios from "axios";
 import { useAuth } from "../context/useAuth";
 
@@ -34,26 +37,60 @@ export default function ProfileModal({ open, handleModal }) {
       }
     }
     if(isLoggedIn) {
-      console.log("Profile data will be fetched!");
+      console.log("Profile Data is going to be fetched")
       fetchProfileData();
     }
   }, [open]);
 
-  useEffect(() => {
-    console.log("Profile Data: ", profileData);
-  }, [profileData]);
+  const getImageSrc = (name) => {
+    if(profileData.profilePictureURL === "") {
+      console.log(name);
+      const nameSplit = name.split(" ");
+      return `https://ui-avatars.com/api?name=${nameSplit[0]}+${nameSplit[1]}`;
+    } else {
+      return profileData.profilePictureURL;
+    }
+  }
 
   return (
     <>
       <Dialog open={open} handler={handleModal}>
         <DialogHeader>Profile</DialogHeader>
-        <DialogBody className="w-full px-3 mx-auto sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl xxl:max-w-xxl">
+        <DialogBody className="	w-full px-3 mx-auto md:max-w-md lg:max-w-lg xl:max-w-xl xxl:max-w-xxl">
           {/* Profile Picture */}
           <div className="flex justify-center mb-[2.5rem]">
-            <img
-              src={profileData.profilePictureURL}
-              className="size-40 rounded-full object-cover"
-            />
+            <div className="size-40 rounded-full bg-gray-200 relative">
+              <img
+                src={getImageSrc(profileData.name)}
+                alt="Profile Picture"
+                className="size-40 rounded-full object-cover"
+              />
+            </div>
+          </div>
+          <div
+            className="flex justify-center mb-[1.75rem] gap-[1rem]"
+          >
+            <Button 
+              variant="gradient"
+            >
+              <div className="flex items-center justify-center">
+                <div className="me-1">
+                  <Camera />
+                </div>
+                Update
+              </div>
+            </Button>
+            <Button
+              variant="gradient"
+              color="red"
+            >
+              <div className="flex items-center justify-center">
+                <div className="me-1">
+                  <TrashBin />
+                </div>
+                Remove
+              </div>
+            </Button>
           </div>
           <div className="text-black flex flex-row items-center mb-[1rem]">
             <div className="mr-[1.75rem]">
