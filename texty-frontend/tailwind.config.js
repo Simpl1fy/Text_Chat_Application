@@ -1,3 +1,5 @@
+import flowbite from "flowbite-react/tailwind"
+
 /** @type {import('tailwindcss').Config} */
 
 import withMT from '@material-tailwind/react/utils/withMT';
@@ -19,5 +21,7 @@ export default withMT({
       }
     },
   },
-  plugins: [],
+  plugins: [
+    flowbite.plugin(),
+  ],
 })

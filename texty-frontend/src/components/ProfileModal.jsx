@@ -8,11 +8,14 @@ import {
   DialogFooter,
 } from "@material-tailwind/react";
 import { Spinner } from "@material-tailwind/react";
+import { Toast } from "flowbite-react";
 // import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import Camera from "../icons/Camera";
 import TrashBin from "../icons/TrashBin";
+import CheckMark from "../icons/CheckMark";
+import XMark from "../icons/XMark";
 import axios from "axios";
 import { useAuth } from "../context/useAuth";
 
@@ -27,6 +30,11 @@ export default function ProfileModal({ open, handleModal }) {
 
   // loading state
   const [loading, setLoading] = useState(false);
+
+  // state for showing toast
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState(1);
 
   useEffect(() => {
     const fetchProfileData = async() => {
@@ -88,10 +96,16 @@ export default function ProfileModal({ open, handleModal }) {
           "profilePictureURL": res.data.data
         }))
         setLoading(false);
+        setShowToast(true)
+        setToastMessage(res.data.message);
+        setToastType(1);
       }
     } catch(err) {
       console.log("An error occured while updating profile picture =", err);
       setLoading(false);
+      setShowToast(true);
+      setToastMessage("An error occured while updating profile picture");
+      setToastType(0);
     }
   }
 
@@ -110,16 +124,41 @@ export default function ProfileModal({ open, handleModal }) {
           "profilePictureURL": ""
         }))
         setLoading(false);
+        setShowToast(true)
+        setToastMessage(res.data.message);
+        setToastType(1);
       }
     } catch(err) {
       console.log("An error occured while removing profile picture =", err);
       setLoading(false);
+      setShowToast(true);
+      setToastMessage("An error occured while removing profile picture");
+      setToastType(0);
     }
   }
 
   return (
     <>
       <Dialog open={open} handler={handleModal}>
+        {showToast && (
+          <Toast className="absolute w-50 top-1 right-2">
+            {toastType ? 
+              (
+                <div className="text-green-500 bg-green-100 p-2 rounded-xl me-2">
+                  <CheckMark />
+                </div>
+              ) 
+              :
+              (
+                <div className="text-red-500 bg-red-100 p-2 rounded-lg me-2">
+                  <XMark />
+                </div>
+              )
+            }
+            <div>{toastMessage}</div>
+            <Toast.Toggle onDismiss={() => setShowToast(false)} />
+          </Toast>
+        )}
         <DialogHeader>Profile</DialogHeader>
         <DialogBody className="	w-full px-3 mx-auto md:max-w-md lg:max-w-lg xl:max-w-xl xxl:max-w-xxl">
           {/* Profile Picture */}
