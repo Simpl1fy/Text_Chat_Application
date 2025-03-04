@@ -10,11 +10,35 @@ import axios from 'axios';
 import { useAuth } from "../context/useAuth";
 import ExclamationIcon from "../icons/ExclamationIcon";
 import { Link, useNavigate } from "react-router-dom";
+import CheckMark from "../icons/CheckMark";
+import XMark from "../icons/XMark";
 
 
 const isValidEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
+}
+
+
+const isPasswordValid = (password) => {
+  return [
+    {
+      message: "Password must be at least 8 characters long",
+      isValid: password.length >= 8
+    },
+    {
+      message: "Password must contain at least one Uppercase letter",
+      isValid: /[A-Z]/.test(password)
+    },
+    {
+      message: "Password must contain at least one number",
+      isValid: /[0-9]/.test(password)
+    },
+    {
+      message: "Password must contain at least one special character",
+      isValid: /[!@#$%^&*(),.?{}|<>]/.test(password)
+    }
+  ]
 }
 
 export default function SimpleRegistrationForm() {
@@ -24,6 +48,7 @@ export default function SimpleRegistrationForm() {
   const [emailValid, setEmailValid] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   const [error, setError] = useState(false);
+  const [passwordError, setPasswordError] = useState([]);
 
   const navigate = useNavigate();
   const { signup } = useAuth();
@@ -79,6 +104,14 @@ export default function SimpleRegistrationForm() {
     setEmailValid(isValidEmail(email));
   }
 
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value
+    setPassword(newPassword);
+    setPasswordError(isPasswordValid(newPassword));
+  }
+
+  const passwordValid = passwordError.every((error) => error.isValid);
+
   return (
       <div className="flex justify-center mt-5">
         <Card color="transparent" className="p-4">
@@ -122,28 +155,52 @@ export default function SimpleRegistrationForm() {
                 }}
                 onChange={handleEmailChange}
             />
-            {!emailValid && <Typography
-              color="red"
-              className="flex items-center gap-2 text-xs font-normal"
-            >
-              <ExclamationIcon />
-              Please give a proper email. e.g. johnbrandy@gmail.com
-            </Typography>}
+            {!emailValid && email.length !== 0 &&
+              <Typography
+                color="red"
+                className="flex items-center gap-2 text-xs font-normal"
+              >
+                <ExclamationIcon />
+                Please give a proper email. e.g. johnbrandy@gmail.com
+              </Typography>
+            }
             <Typography variant="h6" color="blue-gray" className="-mb-3">
                 Password
             </Typography>
             <Input
                 type="password"
                 size="lg"
-                placeholder="********"
+                error={!passwordValid}
+                success={passwordValid}
+                placeholder="Please enter password"
                 className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
                 labelProps={{
                 className: "before:content-none after:content-none",
                 }}
-                onChange={(e) => {setPassword(e.target.value)}}
+                onChange={handlePasswordChange}
             />
+            {
+              passwordError.map((error, index) => (
+                <div key={index} className="flex flex-row items-center text-sm">
+                  {error.isValid ?
+                    (
+                      <div className="text-green-500 bg-green-100 p-2 rounded-full shrink-0 me-2">
+                        <CheckMark />
+                      </div>
+                    )
+                    :
+                    (
+                      <div className="text-red-500 bg-red-100 p-2 rounded-full shrink-0 me-2">
+                        <XMark />
+                      </div>
+                    )
+                  }
+                  <div>{error.message}</div>
+                </div>
+              ))
+            }
             </div>
-            <Button className="mt-6" type="submit" fullWidth>
+            <Button className="mt-6" type="submit" fullWidth disabled={!emailValid && !passwordValid}>
               sign up
             </Button>
             <Typography color="gray" className="mt-4 text-center font-normal">

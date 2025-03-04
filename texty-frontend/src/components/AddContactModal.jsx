@@ -53,9 +53,9 @@ export default function AddContactModal({ isModalOpen, toggleModal, setResText, 
       } catch (err) {
         console.error("An error occurred while fetching search results:", err);
       }
-    }, 500); // 500ms debounce time
+    }, 500);
 
-    return () => clearTimeout(handler); // Cleanup to cancel previous request
+    return () => clearTimeout(handler);
   }, [searchEmail, localToken]);
 
 
