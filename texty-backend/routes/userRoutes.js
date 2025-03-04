@@ -381,23 +381,36 @@ router.get('/contacts', jwtAuthMiddleware, async (req, res) => {
     }
 })
 
-router.post('/search_email', async(req, res) => {
+router.post('/search_email', jwtAuthMiddleware, async(req, res) => {
     const { searchTerm } = req.body;
+
+    const userToken = req.jwtPayload;
+    if(!userToken) {
+        return res.status(401).json({
+            "success": false,
+            "message": "Authorization failed"
+        })
+    }
 
     const regex = new RegExp(`^${searchTerm}`, 'i');
     try {
         const users = await User.aggregate([
             {
-              $project: {
-                name: 1,
-                email: 1,
-                username: { $arrayElemAt: [{ $split: ['$email', '@'] }, 0] }
-              }
+                $addFields: {
+                    username: { $arrayElemAt: [{ $split: ['$email', '@'] }, 0] }
+                }
             },
             {
-              $match: {
-                username: regex
-              }
+                $match: {
+                    username: { $regex: regex }
+                }
+            },
+            {
+                $project: {
+                    name: 1,
+                    email: 1,
+                    profilePictureURL: 1
+                }
             }
           ]);
         res.status(200).json(users);

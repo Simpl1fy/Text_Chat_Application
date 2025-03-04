@@ -32,22 +32,31 @@ export default function AddContactModal({ isModalOpen, toggleModal, setResText, 
   }
 
   useEffect(() => {
-    if (searchEmail) {
-      const searchFunction = async() => {
-        try {
-          const res = await axios.post('http://localhost:5000/user/search_email', {
-            searchTerm: searchEmail
-          })
-          setResult(res.data);
-        } catch(err) {
-          console.error("An error occured while fetching search results:", err);
-        }
-      }
-      searchFunction();
-    } else {
+
+    if(!searchEmail) {
       setResult([]);
+      return;
     }
-  }, [searchEmail]);
+
+    const handler = setTimeout(async () => {
+      try {
+        const res = await axios.post(
+          "http://localhost:5000/user/search_email",
+          { searchTerm: searchEmail },
+          {
+            headers: {
+              Authorization: `Bearer ${localToken}`,
+            },
+          }
+        );
+        setResult(res.data);
+      } catch (err) {
+        console.error("An error occurred while fetching search results:", err);
+      }
+    }, 500); // 500ms debounce time
+
+    return () => clearTimeout(handler); // Cleanup to cancel previous request
+  }, [searchEmail, localToken]);
 
 
   const handleUserClick = async (contactId) => {
@@ -76,6 +85,15 @@ export default function AddContactModal({ isModalOpen, toggleModal, setResText, 
     }
   }
 
+  const getProfilePicture = (ppURL, name) => {
+    if(ppURL.length !== 0) {
+      return ppURL;
+    } else {
+      const nameSplit = name.split(" ");
+      return `https://ui-avatars.com/api?name=${nameSplit[0]}+${nameSplit[1]}`
+    }
+  }
+
   return (
     <>
       <Dialog open={isModalOpen}>
@@ -98,7 +116,23 @@ export default function AddContactModal({ isModalOpen, toggleModal, setResText, 
           />
           <ul>
             {result.map((user) => (
-              <li key={user._id} className='w-100 m-1 p-2 bg-gray-100 border-2 rounded-lg hover:cursor-pointer' onClick={() => handleUserClick(user._id)}>{user.name} - {user.email}</li>
+              <li key={user._id} className='w-100 my-1 p-2 bg-gray-100 border-2 rounded-lg hover:cursor-pointer' onClick={() => handleUserClick(user._id)}>
+                <div className='flex flex-row items-center'>
+                  <img
+                    src={getProfilePicture(user.profilePictureURL, user.name)}
+                    alt='Profile Picture'
+                    className='w-10 h-10 rounded-full object-cover me-2'
+                  />
+                  <div>
+                    <div className='font-bold text-stone-900 text-lg'>
+                      {user.email}
+                    </div>
+                    <div>
+                      {user.name}
+                    </div>
+                  </div>
+                </div>
+              </li>
             ))}
           </ul>
         </DialogBody>
