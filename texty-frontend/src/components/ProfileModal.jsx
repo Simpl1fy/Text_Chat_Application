@@ -52,7 +52,6 @@ export default function ProfileModal({ open, handleModal }) {
       }
     }
     if(isLoggedIn) {
-      console.log("Profile Data is going to be fetched")
       fetchProfileData();
     }
   }, [open]);
@@ -144,13 +143,13 @@ export default function ProfileModal({ open, handleModal }) {
           <Toast className="absolute w-50 top-1 right-2">
             {toastType ? 
               (
-                <div className="text-green-500 bg-green-100 p-2 rounded-xl me-2">
+                <div className="text-green-500 bg-green-100 p-2 rounded-xl me-2 shrink-0">
                   <CheckMark />
                 </div>
               ) 
               :
               (
-                <div className="text-red-500 bg-red-100 p-2 rounded-lg me-2">
+                <div className="text-red-500 bg-red-100 p-2 rounded-lg me-2 shrink-0">
                   <XMark />
                 </div>
               )

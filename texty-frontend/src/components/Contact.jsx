@@ -8,10 +8,9 @@ import { useAlert } from '../context/useAlert';
 import { useContactUpdate } from '../context/useContactUpdate';
 import AddContactModal from './AddContactModal';
 import { useNavigate } from 'react-router-dom';
-import { Alert } from "@material-tailwind/react";
-import ExclamationIcon from '../icons/ExclamationIcon';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Toast } from 'flowbite-react';
+import CheckMark from '../icons/CheckMark';
+import XMark from '../icons/XMark';
 import ThreeDots from '../icons/ThreeDots';
 import { Menu, MenuHandler, MenuList, MenuItem, Button } from "@material-tailwind/react"
 
@@ -117,17 +116,24 @@ export default function Contact() {
     >
       {
         showAlert && (
-          responseResult ?
-          (
-            <Alert icon={<ExclamationIcon />} open={showAlert} onClose={() => setShowAlert(false)} variant='gradient' color='green'>
-              {resText}
-            </Alert>
-          ) : (
-            <Alert icon={<FontAwesomeIcon icon={faXmark} />} open={showAlert} onClose={() => setShowAlert(false)} variant='gradient' color='red'>
-              {resText}
-            </Alert>
-          )
-        ) 
+          <Toast className='absolute top-0 right-2 w-50'>
+            {responseResult ? 
+              (
+                <div className="text-green-500 bg-green-100 p-2 rounded-xl me-2 shrink-0">
+                  <CheckMark />
+                </div>
+              )
+              :
+              (
+                <div className="text-red-500 bg-red-100 p-2 rounded-lg me-2 shrink-0">
+                  <XMark />
+                </div>
+              )
+            }
+            <div>{resText}</div>
+            <Toast.Toggle onDismiss={() => setShowAlert(false)} />
+          </Toast>
+        )
       }
       <nav className="py-3.5 px-4 bg-white shadow-md mb-2">
           <div className="flex  items-center rounded-lg border-2 border-zinc-600 Ebg-sky-50">
