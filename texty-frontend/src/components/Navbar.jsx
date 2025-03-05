@@ -10,7 +10,7 @@ import {
   Avatar
 } from "@material-tailwind/react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleUser, faBars, faCheck, faXmark, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { faCircleUser, faBars, faCheck, faXmark, faRightFromBracket, faGear } from '@fortawesome/free-solid-svg-icons';
 import { faBell } from '@fortawesome/free-regular-svg-icons';
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/useAuth";
@@ -20,6 +20,7 @@ import { useModal } from "../context/MondalContext";
 import { useContactUpdate } from "../context/useContactUpdate";
 import AddContactModal from "./AddContactModal";
 import ProfileModal from "./ProfileModal";
+import EditProfileModal from "./EditProfileModal";
 import axios from "axios";
 
 export default function Navbar() {
@@ -28,8 +29,10 @@ export default function Navbar() {
   const [notificationArray, setNotificationArray] = useState([]);
   const [isNotificationUpdated, setIsNotificationUpdated] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isProfileEditModalOpen, setIsProfileEditModalOpen] = useState(false);
 
   const profileModalHandler = () => setIsProfileModalOpen(!isProfileModalOpen);
+  const profileEditModalHandler = () => setIsProfileEditModalOpen(!isProfileEditModalOpen);
 
   const { isLoggedIn, signout, localToken } = useAuth();
   const { setResText, setShowAlert, setResponseResult } = useAlert();
@@ -182,7 +185,7 @@ export default function Navbar() {
     if(isLoggedIn) {
       fetchUserData();
     }
-  })
+  },[])
 
   return (
     <>
@@ -278,6 +281,13 @@ export default function Navbar() {
                     <FontAwesomeIcon icon={faCircleUser} />
                     Profile
                   </MenuItem>
+                  <MenuItem
+                    className="flex items-center gap-2"
+                    onClick={profileEditModalHandler}
+                  >
+                    <FontAwesomeIcon icon={faGear} />
+                    Manage Account
+                  </MenuItem>
                   <hr className="my-2" />
                   <MenuItem
                     className="flex gap-2 items-center text-md"
@@ -317,6 +327,7 @@ export default function Navbar() {
         </div>
         <AddContactModal isModalOpen={isModalOpen} toggleModal={toggleModal} />
         <ProfileModal open={isProfileModalOpen} handleModal={profileModalHandler} />
+        <EditProfileModal open={isProfileEditModalOpen} handleOpen={profileEditModalHandler} />
       </div>
       <Outlet />
     </>
