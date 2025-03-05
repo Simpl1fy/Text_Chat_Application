@@ -12,6 +12,8 @@ import ExclamationIcon from "../icons/ExclamationIcon";
 import { Link, useNavigate } from "react-router-dom";
 import CheckMark from "../icons/CheckMark";
 import XMark from "../icons/XMark";
+import EyeOpen from "../icons/eyeOpen";
+import EyeSlash from "../icons/eyeSlash";
 
 
 const isValidEmail = (email) => {
@@ -50,6 +52,8 @@ export default function SimpleRegistrationForm() {
   const [error, setError] = useState(false);
   const [passwordError, setPasswordError] = useState([]);
 
+  const [inputType, setInputType] = useState("password");
+
   const navigate = useNavigate();
   const { signup } = useAuth();
 
@@ -67,9 +71,6 @@ export default function SimpleRegistrationForm() {
       setErrorMessage("The given email is not valid");
       return;
     }
-    console.log("name is = ", name);
-    console.log("Email is = ", email);
-    console.log("password is = ", password);
     try {
       const res = await axios.post("http://localhost:5000/user/signup", {
         name: name,
@@ -112,8 +113,16 @@ export default function SimpleRegistrationForm() {
 
   const passwordValid = passwordError.every((error) => error.isValid);
 
+  function togglePasswordType() {
+    if(inputType === 'password') {
+      setInputType('text');
+    } else {
+      setInputType('password');
+    }
+  }
+
   return (
-      <div className="flex justify-center mt-5">
+      <div className="flex justify-center items-center gap-5 mt-5">
         <Card color="transparent" className="p-4">
         <Typography variant="h4" color="blue-gray">
             Sign Up
@@ -154,6 +163,7 @@ export default function SimpleRegistrationForm() {
                 className: "before:content-none after:content-none",
                 }}
                 onChange={handleEmailChange}
+                autoComplete="off"
             />
             {!emailValid && email.length !== 0 &&
               <Typography
@@ -167,20 +177,36 @@ export default function SimpleRegistrationForm() {
             <Typography variant="h6" color="blue-gray" className="-mb-3">
                 Password
             </Typography>
-            <Input
-                type="password"
-                size="lg"
-                error={!passwordValid}
-                success={passwordValid}
-                placeholder="Please enter password"
-                className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-                labelProps={{
-                className: "before:content-none after:content-none",
-                }}
-                onChange={handlePasswordChange}
-            />
-            {
-              passwordError.map((error, index) => (
+            <div className="flex flex-row items-centre relative">
+              <Input
+                  type={inputType}
+                  size="lg"
+                  error={!passwordValid}
+                  success={passwordValid}
+                  placeholder="Please enter password"
+                  className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+                  labelProps={{
+                  className: "before:content-none after:content-none",
+                  }}
+                  onChange={handlePasswordChange}
+                  autoComplete="off"
+              />
+              <span 
+                className="absolute right-2 top-2 cursor-pointer"
+                onClick={togglePasswordType}
+              >
+                {inputType === 'password' ?
+                  (
+                    <EyeOpen />
+                  )
+                  :
+                  (
+                    <EyeSlash />
+                  )
+                }
+              </span>
+            </div>
+            {password.length !== 0 && passwordError.map((error, index) => (
                 <div key={index} className="flex flex-row items-center text-sm">
                   {error.isValid ?
                     (
@@ -197,10 +223,9 @@ export default function SimpleRegistrationForm() {
                   }
                   <div>{error.message}</div>
                 </div>
-              ))
-            }
+              ))}
             </div>
-            <Button className="mt-6" type="submit" fullWidth disabled={!emailValid && !passwordValid}>
+            <Button className="mt-6" type="submit" fullWidth disabled={!emailValid && !passwordValid && name.length !== 0}>
               sign up
             </Button>
             <Typography color="gray" className="mt-4 text-center font-normal">
@@ -209,6 +234,12 @@ export default function SimpleRegistrationForm() {
             </Typography>
           </form>
         </Card>
+        <div>
+          OR
+        </div>
+        <div>
+          <Button>Google</Button>
+        </div>
       </div>
   );
 }

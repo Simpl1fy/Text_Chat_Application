@@ -10,6 +10,8 @@ import ExclamationIcon from "../icons/ExclamationIcon";
 import { useAuth } from "../context/useAuth";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import EyeOpen from "../icons/eyeOpen";
+import EyeSlash from "../icons/eyeSlash";
 
 
 const isValidEmail = (email) => {
@@ -27,6 +29,8 @@ export default function Signin() {
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const { login } = useAuth();
+
+  const [inputType, setInputType] = useState('password');
 
   const handleEmailChange = (e) => {
     const value = e.target.value;
@@ -80,6 +84,14 @@ export default function Signin() {
     }
   }
 
+  function togglePasswordType() {
+    if(inputType === 'password') {
+      setInputType('text');
+    } else {
+      setInputType('password');
+    }
+  }
+
   return (
     <div className="flex justify-center mt-5">
         <Card color="transparent" className="p-4">
@@ -96,41 +108,57 @@ export default function Signin() {
         }
           <form className="mt-8 mb-2 w-80 max-w-screen-lg sm:w-96" onSubmit={handleSubmit}>
             <div className="mb-1 flex flex-col gap-6">
-            <Typography variant="h6" color="blue-gray" className="-mb-3">
-                Your Email
-            </Typography>
-            <Input
-                size="lg"
-                type="email"
-                error={!emailValid}
-                success={emailValid}
-                placeholder="johnbrandy@gmail.com"
-                className=" !border-t-blue-gray-200 focus:!border-t-gray-900 mb-0"
-                labelProps={{
-                className: "before:content-none after:content-none",
-                }}
-                onChange={handleEmailChange}
-            />
-            {!emailValid && <Typography
-              color="red"
-              className="flex items-center gap-2 text-xs font-normal"
-            >
-              <ExclamationIcon />
-              Please give a proper email. e.g. johnbrandy@gmail.com
-            </Typography>}
-            <Typography variant="h6" color="blue-gray" className="-mb-3">
-                Password
-            </Typography>
-            <Input
-                type="password"
-                size="lg"
-                placeholder="********"
-                className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-                labelProps={{
-                className: "before:content-none after:content-none",
-                }}
-                onChange={(e) => {setPassword(e.target.value)}}
-            />
+              <Typography variant="h6" color="blue-gray" className="-mb-3">
+                  Your Email
+              </Typography>
+              <Input
+                  size="lg"
+                  type="email"
+                  error={!emailValid}
+                  success={emailValid}
+                  placeholder="johnbrandy@gmail.com"
+                  className=" !border-t-blue-gray-200 focus:!border-t-gray-900 mb-0"
+                  labelProps={{
+                  className: "before:content-none after:content-none",
+                  }}
+                  onChange={handleEmailChange}
+              />
+              {!emailValid && <Typography
+                color="red"
+                className="flex items-center gap-2 text-xs font-normal"
+              >
+                <ExclamationIcon />
+                Please give a proper email. e.g. johnbrandy@gmail.com
+              </Typography>}
+              <Typography variant="h6" color="blue-gray" className="-mb-3">
+                  Password
+              </Typography>
+              <div className="flex items-center relative">
+                <Input
+                    type={inputType}
+                    size="lg"
+                    placeholder="Enter password"
+                    className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+                    labelProps={{
+                    className: "before:content-none after:content-none",
+                    }}
+                    onChange={(e) => {setPassword(e.target.value)}}
+                />
+                <span 
+                  className="absolute right-2 top-2 cursor-pointer"
+                  onClick={togglePasswordType}
+                >
+                  {inputType === 'password' ?
+                    (
+                      <EyeOpen />
+                    )
+                    :
+                    (
+                      <EyeSlash />
+                    )
+                  }
+                </span>
+              </div>
             </div>
             <Button className="mt-6" type="submit" fullWidth>
             sign in

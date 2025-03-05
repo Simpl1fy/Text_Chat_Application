@@ -7,9 +7,10 @@ import {
   MenuItem,
   IconButton,
   Drawer,
+  Avatar
 } from "@material-tailwind/react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleUser, faBars, faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faCircleUser, faBars, faCheck, faXmark, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { faBell } from '@fortawesome/free-regular-svg-icons';
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/useAuth";
@@ -37,7 +38,15 @@ export default function Navbar() {
   const { isMobile } = useIsMobile();
   const { isModalOpen, toggleModal } = useModal();
 
+  // states for storing user data
+  const [userData, setUserData] = useState({});
+
   const toggleDrawer = () => setDrawerOpen(!drawerOpen);
+
+  const handleMobileProfileClick = () => {
+    toggleDrawer();
+    profileModalHandler();
+  }
 
   const handleSignupClick = () => {
     navigate("/signup");
@@ -150,6 +159,31 @@ export default function Navbar() {
     }
   }
 
+  useEffect(() => {
+    const fetchUserData = async() => {
+      try {
+        const res = await axios.get("http://localhost:5000/user/profile", {
+          headers: {
+            Authorization: `Bearer ${localToken}`
+          }
+        });
+        if(res.data.success) {
+          setUserData(res.data.data);
+        } else {
+          return;
+        }
+      } catch(err) {
+        if(err instanceof Error) {
+          console.log("An error occured =", err.message);
+        }
+      }
+    }
+
+    if(isLoggedIn) {
+      fetchUserData();
+    }
+  })
+
   return (
     <>
       <div className="w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex justify-between items-center p-4">
@@ -212,15 +246,46 @@ export default function Navbar() {
               Signup
               </Button>
             ) : (
-              <Menu>
+              <Menu placement="bottom-end">
                 <MenuHandler>
-                  <IconButton className="bg-inherit hover:bg-white/10">
-                    <FontAwesomeIcon icon={faCircleUser} className="fa-xl text-white" />
-                  </IconButton>
+                  <Avatar
+                    variant="circular"
+                    alt="profile-picture"
+                    className="cursor-pointer h-10 w-10"
+                    src={userData.profilePictureURL}
+                  />
                 </MenuHandler>
                 <MenuList>
-                  <MenuItem onClick={profileModalHandler}>Profile</MenuItem>
-                  <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
+                  <MenuItem 
+                    className="text-slate-900 mb-1 !opacity-100"
+                    disabled
+                  >
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={userData.profilePictureURL}
+                        className="rounded-full size-10 object-cover"
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-md">{userData.name}</span>
+                        <span className="text-md font-bold">{userData.email}</span>
+                      </div>
+                    </div>
+                  </MenuItem>
+                  <MenuItem 
+                    className="flex gap-2 items-center text-md"
+                    onClick={profileModalHandler}
+                  >
+                    <FontAwesomeIcon icon={faCircleUser} />
+                    Profile
+                  </MenuItem>
+                  <hr className="my-2" />
+                  <MenuItem
+                    className="flex gap-2 items-center text-md"
+                    onClick={handleLogoutClick}
+                  >
+                    <FontAwesomeIcon icon={faRightFromBracket} />
+                    Logout
+                  </MenuItem>
                 </MenuList>
               </Menu>
             )}
@@ -241,7 +306,7 @@ export default function Navbar() {
               </Button>
               {isLoggedIn ? (
                 <>
-                  <Button className="bg-inherit text-white hover:bg-white/10" onClick={profileModalHandler}>Profile</Button>
+                  <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleMobileProfileClick}>Profile</Button>
                   <Button className="bg-inherit text-white hover:bg-white/10" onClick={handleLogoutClick}>Logout</Button>
                 </>
                 ) : (
