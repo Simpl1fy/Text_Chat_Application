@@ -1,4 +1,5 @@
 const express = require("express");
+const favicon = require("serve-favicon");
 const http = require("http");
 require("dotenv").config();
 const bodyParser = require("body-parser");
@@ -17,6 +18,7 @@ const corsOptions = {
 
 // cors middleware
 app.use(cors(corsOptions));
+app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 
 // body parser
 app.use(bodyParser.json());
@@ -37,6 +39,17 @@ app.use("/user", userRoutes);
 
 const chatRoutes = require("../routes/chatRoutes");
 app.use("/chat", chatRoutes);
+
+app.use((req, res, next) => {
+    res.status(404).json({ error: "no route found" });
+})
+
+app.use((req, res, next) => {
+    console.log(`Incoming request: ${req.method} ${req.url}`);
+    next();
+})
+
+
 
 const server = http.createServer(app);
 setUpWebSocket(server);
