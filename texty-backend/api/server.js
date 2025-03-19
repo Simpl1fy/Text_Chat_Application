@@ -2,9 +2,9 @@ const express = require('express');
 const http = require('http');
 require('dotenv').config();
 const bodyParser = require('body-parser');
-const db = require('./database/db');
+const db = require('../database/db');
 const cors = require('cors');
-const setUpWebSocket = require('./websocket/webSocketConnection');
+const setUpWebSocket = require('../websocket/webSocketConnection');
 
 const app = express();
 
@@ -26,10 +26,10 @@ app.get('/', (req, res) => {
     res.status(200).send('Text Chat Application using react and express using Mongodb')
 })
 
-const userRoutes = require('./routes/userRoutes');
+const userRoutes = require('../routes/userRoutes');
 app.use('/user', userRoutes);
 
-const chatRoutes = require('./routes/chatRoutes');
+const chatRoutes = require('../routes/chatRoutes');
 app.use('/chat', chatRoutes);
 
 const server = http.createServer(app);
